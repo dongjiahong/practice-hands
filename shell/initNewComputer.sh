@@ -18,3 +18,8 @@ cp ./init.vim ~/.config/nvim/init.vim
 cp ./coc-settings.json ~/.config/nvim/coc-settings.json
 
 # golang
+export GOROOT="/usr/local/go"
+export GOPATH="/home/lele/Library/golang"
+export PATH="$PATH:$GOROOT/bin"
+export PATH="$PATH:$GOPATH/bin"
+export GOPROXY=https://goproxy.io
