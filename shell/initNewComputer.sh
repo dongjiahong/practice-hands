@@ -24,7 +24,8 @@ export GOROOT="/usr/local/go"
 export GOPATH="/home/lele/Library/golang"
 export PATH="$PATH:$GOROOT/bin"
 export PATH="$PATH:$GOPATH/bin"
-export GOPROXY=https://goproxy.io
+export GO111MODULE=on
+export GOPROXY="https://goproxy.io,direct"
 
 # git config
 [user]
