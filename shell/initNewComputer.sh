@@ -13,7 +13,9 @@ ln -s /usr/local/nvim-linux64/bin/nvim /usr/loca/bin/
 # 安装coc插件
 echo "hosts 199.232.28.133 raw.githubusercontent.com" >> /etc/hosts
 curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+# 如果网络问题上面的都不行，我们可以直接去`https://github.com/junegunn/vim-plug/blob/master/plug.vim`复制
 # copy配置文件
+mkdir -p ~/.config/nvim
 cp ./init.vim ~/.config/nvim/init.vim
 cp ./coc-settings.json ~/.config/nvim/coc-settings.json
 
@@ -23,3 +25,13 @@ export GOPATH="/home/lele/Library/golang"
 export PATH="$PATH:$GOROOT/bin"
 export PATH="$PATH:$GOPATH/bin"
 export GOPROXY=https://goproxy.io
+
+# git config
+[user]
+        name = 董家宏
+        email = dongjiahong@hotmail.com
+[alias]
+    st = status
+    co = checkout
+    ci = commit
+    br = branch
