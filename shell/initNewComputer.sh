@@ -36,3 +36,5 @@ export GOPROXY="https://goproxy.io,direct"
     co = checkout
     ci = commit
     br = branch
+[core]
+    editor = vim
