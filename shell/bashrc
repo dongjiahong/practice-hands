@@ -1,0 +1,36 @@
+# show git branch
+find_git_branch () {
+  local dir=. head
+  until [ "$dir" -ef / ]; do
+    if [ -f "$dir/.git/HEAD" ]; then
+      head=$(< "$dir/.git/HEAD")
+      if [[ $head = ref:\ refs/heads/* ]]; then
+        git_branch=" →${head#*/*/}"
+      elif [[ $head != '' ]]; then
+        git_branch=" →(detached)"
+      else
+        git_branch=" →(unknow)"
+      fi
+      return
+    fi
+    dir="../$dir"
+  done
+  git_branch=''
+}
+
+PROMPT_COMMAND="find_git_branch; $PROMPT_COMMAND"
+
+# 红色
+#export PS1="\[\e[35m\][\u@\h \w]$\[\e[m\]"
+# 绿色
+#export PS1="\[\e[32m\][\u@\h \w]$\[\e[m\]"
+# git分支版
+export PS1="\[\e[32m\][\u \w]\[\e[m\]\[\e[36m\]\$git_branch$ \[\e[m\]"
+
+# golang
+export GOROOT="/usr/local/go"
+export GOPATH="/home/lele/Library/golang"
+export PATH="$PATH:$GOROOT/bin"
+export PATH="$PATH:$GOPATH/bin"
+export GO111MODULE=on
+export GOPROXY="https://goproxy.io,direct"

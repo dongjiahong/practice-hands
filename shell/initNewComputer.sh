@@ -18,23 +18,3 @@ curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubuserc
 mkdir -p ~/.config/nvim
 cp ./init.vim ~/.config/nvim/init.vim
 cp ./coc-settings.json ~/.config/nvim/coc-settings.json
-
-# golang
-export GOROOT="/usr/local/go"
-export GOPATH="/home/lele/Library/golang"
-export PATH="$PATH:$GOROOT/bin"
-export PATH="$PATH:$GOPATH/bin"
-export GO111MODULE=on
-export GOPROXY="https://goproxy.io,direct"
-
-# git config
-[user]
-        name = 董家宏
-        email = dongjiahong@hotmail.com
-[alias]
-    st = status
-    co = checkout
-    ci = commit
-    br = branch
-[core]
-    editor = vim
