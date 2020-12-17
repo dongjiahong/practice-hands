@@ -1,5 +1,5 @@
 docker run -d -p 3306:3306 --name mysql-test \
- -v `pwd`/conf/:/etc/mysql \
+ -v `pwd`/conf/my.cnf:/etc/mysql/my.cnf \
  -v `pwd`/mysql-files:/var/lib/mysql-files \
  -v `pwd`/logs/:/logs \
  -v `pwd`/data/:/var/lib/mysql \
