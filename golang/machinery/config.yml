@@ -1,7 +1,10 @@
+# 代理这里选取broker
 broker: redis://localhost:6379
 
+# 默认队列的名字
 default_queue: "asong"
 
+# 用于保存任务结果状态的后端
 result_backend: redis://localhost:6379
 
 redis:

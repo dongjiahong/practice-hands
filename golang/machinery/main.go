@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"log"
 	"time"
 
@@ -15,7 +14,8 @@ func Sum(args []int64) (int64, error) {
 	for _, arg := range args {
 		sum += arg
 	}
-	return sum, errors.New("我说他错了")
+	return sum, nil
+	//return sum, errors.New("我说他错了")
 }
 
 func CallBack(args ...int64) (int64, error) {
@@ -33,6 +33,7 @@ func main() {
 		return
 	}
 
+	// 启服务
 	server, err := machinery.NewServer(cnf)
 	if err != nil {
 		log.Println("start server failed ", err)
@@ -43,11 +44,12 @@ func main() {
 		log.Println("reg task sum failed ", err)
 		return
 	}
-	if err := server.RegisterTask("call", CallBack); err != nil {
-		log.Println("reg task  callback failed ", err)
-		return
-	}
+	//	if err := server.RegisterTask("call", CallBack); err != nil {
+	//		log.Println("reg task  callback failed ", err)
+	//		return
+	//	}
 
+	// 这里的1是限制goruntine的并发数
 	worker := server.NewWorker("asong", 1)
 	go func() {
 		if err := worker.Launch(); err != nil {
@@ -57,14 +59,28 @@ func main() {
 		}
 	}()
 
-	// task signature
-	signature1 := &tasks.Signature{
+	// task signature, 通过singature实例传递给server实例来调度任务
+	signature := &tasks.Signature{
 		Name: "sum",
 		Args: []tasks.Arg{
-			Type:  "[]int64",
-			Value: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			{
+				Type:  "[]int64",
+				Value: []int64{1, 2, 3, 4},
+			},
 		},
 		RetryTimeout: 100,
-		RetryCount:   3,
+		RetryCount:   1,
 	}
+
+	asyncResult, err := server.SendTask(signature)
+	if err != nil {
+		log.Fatal(" send task err: ", err)
+	}
+
+	res, err := asyncResult.Get(time.Duration(time.Second * 1))
+	if err != nil {
+		log.Fatal("get result err: ", err)
+	}
+	// HumanReadableResults这个方法可以处理反射值，获得最终结果
+	log.Printf("get res is %v\n", tasks.HumanReadableResults(res))
 }
