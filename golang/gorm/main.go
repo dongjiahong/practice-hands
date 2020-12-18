@@ -68,9 +68,33 @@ func test_find() {
 	fmt.Println(drs2)
 }
 
+func test_struct_raw() {
+	var drs []*DistributeRecord
+	if err := db.Raw("select id, coin from tb_distribute_record limit 2;").Scan(&drs).Error; err != nil {
+		//if err := db.Raw("select id, coin from tb_distribute_record limit 2;").Scan(&drs).Error; err != nil {
+		fmt.Println("===> struct err: ", err)
+	}
+	fmt.Printf("===> drs: %+v", drs[0])
+}
+
+func test_struct_raw_parameter(dr interface{}) {
+	drs, _ := dr.([]*DistributeRecord)
+	if err := db.Raw("select id, coin from tb_distribute_record limit 2;").Scan(&drs).Error; err != nil {
+		fmt.Println("===> struct err: ", err)
+	}
+	fmt.Printf("===> drs: %+v\n", drs[0])
+}
+
+func run_test_struct_raw_parameter() {
+	drs := []*DistributeRecord{}
+	test_struct_raw_parameter(drs)
+	fmt.Printf("===> drs: %+v\n", drs)
+}
+
 func main() {
 	initDB()
 	//test_raw()
-	test_find()
-
+	//test_find()
+	//test_struct_raw()
+	run_test_struct_raw_parameter()
 }
