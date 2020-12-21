@@ -7,12 +7,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// 定义我们的产品数据结构，有两个字段分别是id、和name
 type Product struct {
 	id   string
 	name string
 }
 
+// 要测试的函数，主要记录的是产品被浏览的次数，并插入一条产品浏览日志
 func recordStats(db *sql.DB, userID, productID int64) (err error) {
+	// 这里我们选择了事务
 	tx, err := db.Begin()
 	if err != nil {
 		return
@@ -21,9 +24,9 @@ func recordStats(db *sql.DB, userID, productID int64) (err error) {
 	defer func() {
 		switch err {
 		case nil:
-			err = tx.Commit()
+			err = tx.Commit() // 提交事务
 		default:
-			tx.Rollback()
+			tx.Rollback() // 回滚事务
 		}
 	}()
 	if _, err = tx.Exec("update products set views = views+1"); err != nil {
@@ -35,8 +38,8 @@ func recordStats(db *sql.DB, userID, productID int64) (err error) {
 	return
 }
 
+// 这里要测试的是产品的查询功能
 func GetSingleProductDao(db *sql.DB, id string) (*Product, error) {
-
 	p := Product{}
 	err := db.QueryRow("SELECT * FROM products WHERE id = ?", id).Scan(&p.id, &p.name)
 	if err != nil {
