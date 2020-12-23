@@ -1,0 +1,16 @@
+[user]
+        name = 董家宏
+        email = dongjiahong@hotmail.com
+[alias]
+    st = status
+    co = checkout
+    ci = commit
+    br = branch
+[core]
+    editor = vim
+[http]
+        proxyAuthMethod = basic
+        proxy = http://hyys:hyyspass@117.160.204.14:10009
+[https]
+        proxy = http://hyys:hyyspass@117.160.204.14:10009
+
