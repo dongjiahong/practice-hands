@@ -2,9 +2,6 @@ package handlerouter
 
 import (
 	"fmt"
-	"gin-machinery/gredis"
-	"net/http"
-	"strings"
 
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/tasks"

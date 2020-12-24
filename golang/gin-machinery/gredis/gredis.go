@@ -2,7 +2,6 @@ package gredis
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/go-redis/redis"
 

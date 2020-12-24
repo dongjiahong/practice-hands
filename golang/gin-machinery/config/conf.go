@@ -27,7 +27,7 @@ func InitConfig() {
 		log.Panic(pErr)
 	}
 	path += "/config/settings.toml"
-	if _, err := toml.DecodeFile(path, &cfg); err != nil {
+	if _, err := toml.DecodeFile(path, &Cfg); err != nil {
 		log.Panic(err)
 	}
 }

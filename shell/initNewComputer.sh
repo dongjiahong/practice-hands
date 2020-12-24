@@ -1,6 +1,4 @@
-set -x
-# 请使用sudo initNewComputer.sh执行该脚本
-# 安装wget、curl
+
 apt-get install wget curl
 # 1.安装neovim
 echo "install neovim"
@@ -18,3 +16,4 @@ curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubuserc
 mkdir -p ~/.config/nvim
 cp ./init.vim ~/.config/nvim/init.vim
 cp ./coc-settings.json ~/.config/nvim/coc-settings.json
+# coc 需要用到nodejs，但是系统apt的node版本过低，要去官网下载安装
