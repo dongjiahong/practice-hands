@@ -10,6 +10,7 @@ import (
 )
 
 func Sum(args []int64) (int64, error) {
+	time.Sleep(time.Second * 10)
 	sum := int64(0)
 	for _, arg := range args {
 		sum += arg
@@ -27,19 +28,21 @@ func CallBack(args ...int64) (int64, error) {
 }
 
 func main() {
+	// 1.读取文件配置
 	cnf, err := config.NewFromYaml("./config.yml", false)
 	if err != nil {
 		log.Println("config failed ", err)
 		return
 	}
 
-	// 启服务
+	// 2.启服务
 	server, err := machinery.NewServer(cnf)
 	if err != nil {
 		log.Println("start server failed ", err)
 		return
 	}
-	// 注册任务
+
+	// 3.注册任务
 	if err := server.RegisterTask("sum", Sum); err != nil {
 		log.Println("reg task sum failed ", err)
 		return
@@ -49,6 +52,7 @@ func main() {
 	//		return
 	//	}
 
+	// 4.启动worker
 	// 这里的1是限制goruntine的并发数
 	worker := server.NewWorker("asong", 1)
 	go func() {
@@ -59,6 +63,7 @@ func main() {
 		}
 	}()
 
+	// signature签名，里面包含了调度需要的信息
 	// task signature, 通过singature实例传递给server实例来调度任务
 	signature := &tasks.Signature{
 		Name: "sum",
@@ -68,8 +73,8 @@ func main() {
 				Value: []int64{1, 2, 3, 4},
 			},
 		},
-		RetryTimeout: 100,
-		RetryCount:   1,
+		RetryTimeout: 100, // 重试超时
+		RetryCount:   1,   // 重试次数
 	}
 
 	asyncResult, err := server.SendTask(signature)

@@ -1,0 +1,17 @@
+broker: "redis://localhost:6379"
+default_queue: "machinery_tasks"
+
+result_backend: "redis://localhost:6379"
+
+# redis的配置信息参考https://github.com/RichardKnop/machinery/blob/master/v1/config/config.go
+redis:
+    max_idle: 3 # 池里最大闲置连接数
+    max_active: 3 #池中分配的最大连接数，当未0时没有限制，默认100
+    max_idle_timeout: 240
+    wait: true # 默认未true,表示如果连接数被max_active限制了没有可用，那么当执行get()时需要等待
+    read_timeout: 15 # 默认15秒，指读取单个命令的答复超时(秒为单位)
+    write_timeout: 15 # 和上面的类似，写入命令的超时时间
+    connect_timeout: 15 # 链接redis的超时时间
+    normal_tasks_poll_period: 1000 # 轮询redis正常任务的时间间隔默认1000（毫秒未单位）
+    delayed_tasks_poll_period: 500 # 轮询redis延迟任务的时间默认20ms
+    delayed_task_key: "machinery_tasks"

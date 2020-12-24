@@ -18,4 +18,3 @@ redis:
     normal_tasks_poll_period: 1000
     delayed_tasks_poll_period: 500
     delayed_task_key: "asong"
-
