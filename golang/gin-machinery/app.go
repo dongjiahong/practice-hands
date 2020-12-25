@@ -45,9 +45,11 @@ func init() {
 		panic(err)
 	}
 
+	// 启一个machinery的服务
 	if server, err = machinery.NewServer(cnf); err != nil {
 		panic(err)
 	}
+	// 实例化一个redis的链接
 	gredis.InitRedisClient()
 }
 
@@ -59,14 +61,17 @@ func loadConfig(configPath string) (*config.Config, error) {
 }
 
 func runWorker() (err error) {
+	// 注册任务
 	server.RegisterTasks(tasksMap)
 	if err != nil {
 		panic(err)
 	}
+	// 启动任务
 	workers := server.NewWorker("worker_test", 10)
 	err = workers.Launch()
 	if err != nil {
-		panic(err)
+		// machinery实现了gracefully，如果ctrl+c也在这里打印
+		fmt.Println("runWorker err: ", err)
 	}
 	return
 }
@@ -78,12 +83,29 @@ func runSender() (err error) {
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
+	r.GET("/get", func(c *gin.Context) {
+		key, exist := c.GetQuery("key")
+		if !exist {
+			c.String(200, "can't find the key")
+			fmt.Println("没有获取到参数key")
+			return
+		}
+		value, err := gredis.GetValueFromKey(key)
+		if err != nil {
+			fmt.Println("查询rdis出错： ", err)
+			c.String(200, err.Error())
+			return
+		}
+		c.String(200, value)
+	})
 	r.GET("/add", func(c *gin.Context) {
 		handlerouter.Add(c, server)
 	})
 	r.POST("/longRunningTask", func(c *gin.Context) {
 		handlerouter.LongRunningTask(c, server)
 	})
+
+	// 启http服务端口18888
 	err = r.Run(fmt.Sprintf(":%d", conf.Cfg.AppPort))
 	return
 }

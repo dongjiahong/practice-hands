@@ -15,13 +15,14 @@ func Add(c *gin.Context, s *machinery.Server) {
 		uid = uuid.New().String()
 	)
 
+	// 任务签名--所谓的签名就是包含着任务的各种信息，包含参数
 	signature := &tasks.Signature{
 		UUID: uid,
 		Name: "add",
 		Args: []tasks.Arg{
 			{
 				Type:  "int64",
-				Value: 1,
+				Value: 8,
 			},
 			{
 				Type:  "int64",
@@ -30,6 +31,7 @@ func Add(c *gin.Context, s *machinery.Server) {
 		},
 	}
 
+	// SendTask 发布一个任务到默认的队列中
 	asyncResult, err := s.SendTask(signature)
 	if err != nil {
 		panic(err.Error())

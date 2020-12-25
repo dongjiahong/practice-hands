@@ -20,3 +20,9 @@ func InitRedisClient() {
 		PoolSize: conf.Cfg.TaskRedisPoolSize,
 	})
 }
+
+// Get value from the key
+func GetValueFromKey(key string) (string, error) {
+	val, err := Client.Get(key).Result()
+	return val, err
+}
