@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "gin-swagger/docs" // swag init 生成的docs文件夹别忘了加进来
 )
 
 // @title 测试
