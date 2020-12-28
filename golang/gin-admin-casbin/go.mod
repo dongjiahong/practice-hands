@@ -1,6 +1,6 @@
 module go-admin
 
-go 1.12
+go 1.15
 
 require (
 	github.com/Anderson-Lu/gofasion v0.0.0-20190530065914-6a05b679ee48
