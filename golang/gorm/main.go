@@ -41,9 +41,19 @@ func initDB() {
 
 func test_raw() {
 	var c []Class
-	err := db.Where("id = 1").Find(&c)
-	fmt.Println(c, err.GetErrors())
+	err := db.Where("id = 10").Find(&c).Error
+	fmt.Println("1.==> class: ", c)
+	fmt.Println("1.==> err: ", err)
 
+	var cc Class
+	err = db.Where("id = 10").Find(&cc).Error
+	fmt.Println("2.==> class: ", cc)
+	fmt.Println("2.==> err: ", err)
+
+	var ccc Class
+	err = db.Where("id = 10").Scan(&ccc).Error
+	fmt.Println("3.==> class: ", ccc)
+	fmt.Println("3.==> err: ", err)
 }
 
 func main() {

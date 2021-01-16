@@ -50,7 +50,8 @@ Plug 'scrooloose/nerdtree'
 Plug 'tomasr/molokai'
 " golang
 Plug 'fatih/vim-go'
-
+" commenter 注释
+Plug 'scrooloose/nerdcommenter'
 " coc
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
@@ -59,3 +60,8 @@ call plug#end()
 "-------->>NERD Tree<<-------
 "宏F2打开目录树
 nmap <F2> :NERDTreeToggle <CR>
+"-------->>NERD Commenter<<---
+let mapleader=","
+" ,cc 注释当前行
+" ,cs 以性感方式注释
+" ,cu 取消注释

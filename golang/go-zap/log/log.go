@@ -2,47 +2,57 @@ package log
 
 import (
 	"os"
-	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/natefinch/lumberjack.v2" // 分割日志
 )
 
-var Logger *zap.Logger
+var Logger *zap.SugaredLogger
 
 func init() {
-	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "foo.log",
-		MaxSize:    500, // megabytes
-		MaxBackups: 3,
-		MaxAge:     2, // days
+	var coreArr []zapcore.Core
+
+	// 获取编码器
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder        // 指定时间格式
+	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 按级别显示不同颜色，不需要的话用zapcore.CapitalLevelEncoder
+	//encoderConfig.EncodeCaller = zapcore.FullCallerEncoder       // 显示完整路径
+	encoder := zapcore.NewConsoleEncoder(encoderConfig) // NewJSONEncoder()输出json格式，NewConsoleEncoder()输出普通文本格式
+
+	// 日志级别
+	highPriority := zap.LevelEnablerFunc(func(lev zapcore.Level) bool { // error级别
+		return lev >= zap.ErrorLevel
+	})
+	lowPriority := zap.LevelEnablerFunc(func(lev zapcore.Level) bool { // info和debug级别，debug级别是最低的
+		return lev < zap.ErrorLevel && lev >= zap.DebugLevel
 	})
 
-	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(NewEncoderConfig()),
-		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), w),
-		zap.DebugLevel,
-	)
-	Logger = zap.New(core, zap.AddCaller())
-}
+	// info文件writeSyncer
+	infoFileWriteSyncer := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "./info.log", // 日志文件存放目录，如果文件夹不存在会自动创建
+		MaxSize:    200,          // 文件限制，单位MB
+		MaxAge:     7,            // 日志保留的天数
+		MaxBackups: 10,           // 最大保留日志文件数量
+		Compress:   false,        // 是否压缩日志
+	})
+	infoFileCore := zapcore.NewCore(encoder,
+		zapcore.NewMultiWriteSyncer(infoFileWriteSyncer, zapcore.AddSync(os.Stdout)),
+		lowPriority) // 第三个及之后的参数为写入文件的日志级别，ErrorLevel模式只记录error级别的日志
 
-func TimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
-}
+	// error文件writeSyncer
+	errorFileWriteSyncer := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "./error.log", // 日志文件存放目录，如果文件夹不存在会自动创建
+		MaxSize:    200,           // 文件限制，单位MB
+		MaxAge:     7,             // 日志保留的天数
+		MaxBackups: 10,            // 最大保留日志文件数量
+		Compress:   false,         // 是否压缩日志
+	})
+	errorFileCore := zapcore.NewCore(encoder,
+		zapcore.NewMultiWriteSyncer(errorFileWriteSyncer, zapcore.AddSync(os.Stdout)),
+		highPriority) // 第三个及之后的参数为写入文件的日志级别，ErrorLevel模式只记录error级别的日志
 
-func NewEncoderConfig() zapcore.EncoderConfig {
-	return zapcore.EncoderConfig{
-		TimeKey:        "T",
-		LevelKey:       "L",
-		NameKey:        "N",
-		CallerKey:      "C",
-		MessageKey:     "M",
-		StacktraceKey:  "S",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     TimeEncoder,
-		EncodeDuration: zapcore.StringDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
+	coreArr = append(coreArr, infoFileCore)
+	coreArr = append(coreArr, errorFileCore)
+	Logger = zap.New(zapcore.NewTee(coreArr...), zap.AddCaller()).Sugar() // zap.AddCaller()为显示文件名和行号，可省略
 }

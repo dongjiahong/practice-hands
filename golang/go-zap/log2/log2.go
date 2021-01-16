@@ -8,7 +8,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2" // 分割日志
 )
 
-var Logger *zap.Logger
+var Logger *zap.SugaredLogger
 
 func init() {
 	var coreArr []zapcore.Core
@@ -54,5 +54,5 @@ func init() {
 
 	coreArr = append(coreArr, infoFileCore)
 	coreArr = append(coreArr, errorFileCore)
-	Logger = zap.New(zapcore.NewTee(coreArr...), zap.AddCaller()) // zap.AddCaller()为显示文件名和行号，可省略
+	Logger = zap.New(zapcore.NewTee(coreArr...), zap.AddCaller()).Sugar() // zap.AddCaller()为显示文件名和行号，可省略
 }
