@@ -14,10 +14,28 @@ type Student struct {
 	Name string
 }
 
-type Class struct {
-	Id        int
+//type Class struct {
+//Id        int
+//ClassName string
+//Students  []Student
+//}
+
+type Id struct {
+	Id int
+}
+
+type ClassName struct {
 	ClassName string
-	Students  []Student
+}
+type Class struct {
+	Id
+	ClassName
+	Students []Student
+}
+type C struct {
+	Id
+	ClassName
+	Students []Student
 }
 
 func initDB() {
@@ -40,20 +58,19 @@ func initDB() {
 }
 
 func test_raw() {
-	var c []Class
-	err := db.Where("id = 10").Find(&c).Error
-	fmt.Println("1.==> class: ", c)
-	fmt.Println("1.==> err: ", err)
+	//var c []Class
+	//err := db.Where("id = 10").Find(&c).Error
+	//fmt.Println("1.==> class: ", c)
+	//fmt.Println("1.==> err: ", err)
 
-	var cc Class
-	err = db.Where("id = 10").Find(&cc).Error
-	fmt.Println("2.==> class: ", cc)
-	fmt.Println("2.==> err: ", err)
+	var cc C
+	db = db.Table("class").Where("id = 1").First(&cc) // 指定表名
+	fmt.Println("====> name: ", cc.ClassName, " raws: ", db.RowsAffected)
 
 	var ccc Class
-	err = db.Where("id = 10").Scan(&ccc).Error
-	fmt.Println("3.==> class: ", ccc)
-	fmt.Println("3.==> err: ", err)
+	db = db.Table("class").Where("id = 1").First(&ccc) // 指定表名
+	fmt.Println("====> name: ", cc.ClassName, " raws: ", db.RowsAffected)
+
 }
 
 func main() {
