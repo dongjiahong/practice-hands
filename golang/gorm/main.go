@@ -38,6 +38,13 @@ type C struct {
 	Students []Student
 }
 
+func AddStudent(s *Student) {
+	fmt.Println(s)
+	err := db.Create(s).Scan(&s).Error
+	fmt.Println(err)
+	fmt.Println(s)
+}
+
 func initDB() {
 	username := "root"
 	password := ""
@@ -75,5 +82,10 @@ func test_raw() {
 
 func main() {
 	initDB()
-	test_raw()
+	//test_raw()
+
+	s := &Student{
+		Name: "haha",
+	}
+	AddStudent(s)
 }
