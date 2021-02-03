@@ -14,10 +14,24 @@ func init() {
 	var coreArr []zapcore.Core
 
 	// 获取编码器
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder        // 指定时间格式
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 按级别显示不同颜色，不需要的话用zapcore.CapitalLevelEncoder
-	//encoderConfig.EncodeCaller = zapcore.FullCallerEncoder       // 显示完整路径
+	encoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "ts",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		FunctionKey:    "function",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // 按级别显示不同颜色，不需要的话用zapcore.CapitalLevelEncoder
+		EncodeTime:     zapcore.ISO8601TimeEncoder,       // 指定时间格式
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+	//encoderConfig := zap.NewProductionEncoderConfig()
+	//encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder        // 指定时间格式
+	//encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 按级别显示不同颜色，不需要的话用zapcore.CapitalLevelEncoder
+	////encoderConfig.EncodeCaller = zapcore.FullCallerEncoder       // 显示完整路径
 	encoder := zapcore.NewConsoleEncoder(encoderConfig) // NewJSONEncoder()输出json格式，NewConsoleEncoder()输出普通文本格式
 
 	// 日志级别
@@ -55,4 +69,5 @@ func init() {
 	coreArr = append(coreArr, infoFileCore)
 	coreArr = append(coreArr, errorFileCore)
 	Logger = zap.New(zapcore.NewTee(coreArr...), zap.AddCaller()).Sugar() // zap.AddCaller()为显示文件名和行号，可省略
+	//Logger = zap.New(zapcore.NewTee(coreArr...), zap.AddCaller(), zap.AddStacktrace(highPriority)).Sugar() // zap.AddCaller()为显示文件名和行号，可省略
 }

@@ -38,11 +38,11 @@ type C struct {
 	Students []Student
 }
 
-func AddStudent(s *Student) {
+func AddStudent(s *Student) *Student {
 	fmt.Println(s)
 	err := db.Create(s).Scan(&s).Error
 	fmt.Println(err)
-	fmt.Println(s)
+	return s
 }
 
 func initDB() {
@@ -87,5 +87,5 @@ func main() {
 	s := &Student{
 		Name: "haha",
 	}
-	AddStudent(s)
+	fmt.Println(AddStudent(s))
 }
