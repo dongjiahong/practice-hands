@@ -12,6 +12,7 @@ var db *gorm.DB
 type Student struct {
 	Id   int
 	Name string
+	Age  int
 }
 
 //type Class struct {
@@ -43,6 +44,11 @@ func AddStudent(s *Student) *Student {
 	err := db.Create(s).Scan(&s).Error
 	fmt.Println(err)
 	return s
+}
+
+func UpdateStudent(s *Student) {
+	err := db.Model(&Student{}).Save(s).Error
+	fmt.Println(err)
 }
 
 func initDB() {
@@ -85,7 +91,11 @@ func main() {
 	//test_raw()
 
 	s := &Student{
+		Id:   3,
 		Name: "haha",
+		//Age:  0,
 	}
-	fmt.Println(AddStudent(s))
+	//fmt.Println(AddStudent(s))
+	fmt.Println("=========================")
+	UpdateStudent(s)
 }
