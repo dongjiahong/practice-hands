@@ -51,6 +51,25 @@ func UpdateStudent(s *Student) {
 	fmt.Println(err)
 }
 
+func GetStudentId() {
+	var ids []Id
+	err := db.Model(&Student{}).Scan(&ids).Error
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(ids)
+}
+
+func GetStudentById(ids []int) {
+	var ss []Student
+	//err := db.Where(ids).Find(&ss).Error // 跟下面等同
+	err := db.Raw("select * from student where age > 0 and id in (?)", ids).Find(&ss).Error
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(ss)
+}
+
 func initDB() {
 	username := "root"
 	password := ""
@@ -98,4 +117,7 @@ func main() {
 	//fmt.Println(AddStudent(s))
 	fmt.Println("=========================")
 	UpdateStudent(s)
+	GetStudentId()
+	GetStudentById([]int{1, 2, 3})
+	GetStudentById([]int{})
 }
