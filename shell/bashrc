@@ -34,3 +34,11 @@ export PATH="$PATH:$GOROOT/bin"
 export PATH="$PATH:$GOPATH/bin"
 export GO111MODULE=on
 export GOPROXY="https://goproxy.io,direct"
+
+# proxy
+#  export http_proxy="socks5://vpn2ha:vpn_ha666@47.243.22.227:60338"
+#  export https_proxy="socks5://vpn2ha:vpn_ha666@47.243.22.227:60338"
+
+# rust
+source "$HOME/.cargo/env"
+export PATH="$PATH:$HOME/.cargo/bin"
