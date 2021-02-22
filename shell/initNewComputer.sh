@@ -15,5 +15,12 @@ curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubuserc
 # copy配置文件
 mkdir -p ~/.config/nvim
 cp ./init.vim ~/.config/nvim/init.vim
+
+# golang 安装二进制工具
+GoInstallBinaries
+# rust安装组件
+rustup component add rls rust-analysis rust-src
+
 cp ./coc-settings.json ~/.config/nvim/coc-settings.json
 # coc 需要用到nodejs，但是系统apt的node版本过低，要去官网下载安装
+
