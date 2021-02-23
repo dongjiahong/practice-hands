@@ -54,6 +54,10 @@ Plug 'fatih/vim-go'
 Plug 'scrooloose/nerdcommenter'
 " coc
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" rust
+Plug 'rust-lang/rust.vim'
+" luochen1990/rainbow 彩虹括号
+Plug 'luochen1990/rainbow'
 
 call plug#end()
 
@@ -65,3 +69,9 @@ let mapleader=","
 " ,cc 注释当前行
 " ,cs 以性感方式注释
 " ,cu 取消注释
+
+"------>>> rust <<<---------
+let g:rustfmt_autosave = 1
+
+"------->>>rainbow 彩虹括号<<<-----
+let g:rainbow_active = 1
