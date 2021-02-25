@@ -2,6 +2,18 @@ use rand::Rng;
 use std::cmp::Ordering;
 use std::io;
 
+fn hello() -> i32 {
+    let a = [1, 2, 3, 4, 5];
+    for e in a.iter() {
+        println!("hello => {}", e)
+    }
+
+    for n in (1..6).rev() {
+        println!(" {}!", n);
+    }
+    1 + 4
+}
+
 fn main() {
     println!("请猜一个数字!");
 
@@ -30,4 +42,6 @@ fn main() {
             }
         }
     }
+
+    println!("hello {}: ", hello())
 }

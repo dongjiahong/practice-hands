@@ -1,5 +1,5 @@
 syntax = "proto3"; // 指定版本
-package hello;     // 指定默认包
+package hello;     // 指定默认包, 默认转换成go中的包名与此一致，如果指定不同的报名使用go_package选项
 
 // 指定golang包名
 option go_package = ".;hello";
@@ -10,7 +10,7 @@ service Hello {
     rpc SayHello(HelloRequest) returns (HelloResponse) {}
 }
 
-// HelloRequest 请求结构体
+// HelloRequest 请求结构体, message对应go中的struct
 message HelloRequest {
     string name = 1;
 }
