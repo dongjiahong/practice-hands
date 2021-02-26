@@ -58,6 +58,9 @@ func getCurrentDirectory() string {
 }
 
 // Init 初始化
+// 1.初始化日志
+// 2.初始化主节点
+// 3.初始化全部节点
 func Init() {
 	if _, err := toml.DecodeFile(curr+"trx.toml", &globalConf); err != nil {
 		fmt.Println(err)
@@ -133,6 +136,7 @@ func Init() {
 
 	log.Info("lastblock:", targetHeight)
 
+	// 获取钱包信息
 	err = getWalletInfo()
 	if err != nil {
 		log.Error(err)

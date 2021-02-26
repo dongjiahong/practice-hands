@@ -44,7 +44,7 @@ func timePrint() string {
 
 func preFun() {
 	trx.Init()
-	trx.InitAllContarctServer(ctx, exit)
+	trx.InitAllContarctServer(ctx, exit) // 初始化不同合约的服务
 	fmt.Printf("tronrpc start, time=%s\n", timePrint())
 }
 
