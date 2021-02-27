@@ -1,0 +1,8 @@
+name = "viper"
+version = "v1.1.0"
+
+[sms]
+[sms.apple]
+name = "apple"
+[sms.orange]
+name = "orange"
