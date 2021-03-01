@@ -10,6 +10,7 @@ type Config struct {
 	Name    string
 	Version string
 	Sms     struct {
+		Use   string
 		Apple struct {
 			Name string
 		}
@@ -32,5 +33,5 @@ func main() {
 	if err := v.Unmarshal(&c); err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v", c)
+	fmt.Printf("%+v\n", c)
 }

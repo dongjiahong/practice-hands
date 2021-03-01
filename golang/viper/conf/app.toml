@@ -2,6 +2,7 @@ name = "viper"
 version = "v1.1.0"
 
 [sms]
+use = "fruit"
 [sms.apple]
 name = "apple"
 [sms.orange]
