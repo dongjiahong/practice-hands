@@ -15,14 +15,21 @@ type Args struct {
 	Arg1, Arg2 int
 }
 
+type Reply struct {
+	Res int `json:"res"`
+}
+
 func main() {
 	// 1.链接
 	conn, err := jsonrpc.Dial("tcp", "127.0.0.1:9090")
 	if err != nil {
 		log.Fatal("can't not connect to 127.0.0.1:9090")
+		panic(err)
 	}
 
-	var reply int
+	//reply := Reply{}
+	var reply Reply
+	//var reply int
 	var args = Args{15, 3}
 
 	// 2.调用
@@ -30,5 +37,5 @@ func main() {
 		log.Fatal("call MathService.Add error: ", err)
 	}
 
-	fmt.Printf("MathService.Add(%d, %d)=%d\n", args.Arg1, args.Arg2, reply)
+	fmt.Printf("MathService.Add(%d, %d)=%+v\n", args.Arg1, args.Arg2, reply)
 }

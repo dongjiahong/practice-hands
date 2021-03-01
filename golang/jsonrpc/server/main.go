@@ -22,13 +22,19 @@ type Args struct {
 	Arg1, Arg2 int
 }
 
+type Reply struct {
+	Res int `json:"res"`
+}
+
 // 2.实现加法服务，加法需要两个参数
 // 所有jsonrpc方法只有两个参数，第一个用于接收所有参数，
 // 第二个参数用于处理返回结果，是一个指针
 // 所有的jsonrpc都只有一个返回值，error用于指示是否发生错误
-func (that *MathService) Add(args Args, reply *int) error {
-	*reply = args.Arg1 + args.Arg2
-	log.Printf("Add arg1: %d, arg2: %d, result: %d\n", args.Arg1, args.Arg2, *reply)
+//func (that *MathService) Add(args Args, reply *int) error {
+func (that *MathService) Add(args Args, reply *Reply) error {
+	//*reply = args.Arg1 + args.Arg2
+	reply.Res = args.Arg1 + args.Arg2
+	log.Printf("Add arg1: %d, arg2: %d, result: %+v\n", args.Arg1, args.Arg2, *reply)
 	return nil
 }
 
@@ -45,6 +51,7 @@ func main() {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
+			log.Println("err: ", err)
 			continue
 		}
 		// 5.调用jsonrpc

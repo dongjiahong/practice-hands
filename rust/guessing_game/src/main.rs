@@ -43,5 +43,7 @@ fn main() {
         }
     }
 
-    println!("hello {}: ", hello())
+    println!("hello {}: ", hello());
+    let s = String::from("hello");
+    println!("{}", &s[0..2]);
 }
