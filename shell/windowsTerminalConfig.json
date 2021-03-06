@@ -1,6 +1,7 @@
 {
 "profiles": {
         "defaults": {
+            "bellStyle": "none", // 关闭烦人的提示声音
             "fontSize": 12,
             "useAcrylic": false,
             "acrylicOpacity": 0.75,
