@@ -58,6 +58,8 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'rust-lang/rust.vim'
 " luochen1990/rainbow 彩虹括号
 Plug 'luochen1990/rainbow'
+" toml
+Plug 'cespare/vim-toml'
 
 call plug#end()
 

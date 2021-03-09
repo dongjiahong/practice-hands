@@ -12,7 +12,7 @@ import (
 
 // 定义MathService所需要的参数，一般是两个int类型
 type Args struct {
-	Arg1, Arg2 int
+	a, b int
 }
 
 type Reply struct {
@@ -21,7 +21,7 @@ type Reply struct {
 
 func main() {
 	// 1.链接
-	conn, err := jsonrpc.Dial("tcp", "127.0.0.1:9090")
+	conn, err := jsonrpc.Dial("tcp", "127.0.0.1:9999")
 	if err != nil {
 		log.Fatal("can't not connect to 127.0.0.1:9090")
 		panic(err)
@@ -33,9 +33,9 @@ func main() {
 	var args = Args{15, 3}
 
 	// 2.调用
-	if err := conn.Call("MathService.Add", args, &reply); err != nil {
+	if err := conn.Call("Sum", args, &reply); err != nil {
 		log.Fatal("call MathService.Add error: ", err)
 	}
 
-	fmt.Printf("MathService.Add(%d, %d)=%+v\n", args.Arg1, args.Arg2, reply)
+	fmt.Printf("MathService.Add(%d, %d)=%+v\n", args.a, args.b, reply)
 }

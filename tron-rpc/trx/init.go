@@ -96,30 +96,35 @@ func Init() {
 		port = globalConf.Client.Port
 	}
 
+	// 最小归集数量
 	minAmount = globalConf.Collection.MinAmount
 
 	minScanBlock = globalConf.Scantraderecord.MinScanBlock
 
 	if globalConf.Scantraderecord.GoroutineNum > 0 {
+		// 开启扫描的协程数量
 		goroutineNumScan = globalConf.Scantraderecord.GoroutineNum
 	}
 
 	if globalConf.Client.Count > 0 && globalConf.Client.Count < 100 {
 		count = globalConf.Client.Count
 	}
-	// 最大100trx
+	// 最大100trx, 转账合约消耗sun个数，建议为5000000
 	if globalConf.Client.Feelimit > 0 && globalConf.Client.Feelimit < 100000000 {
 		feelimit = globalConf.Client.Feelimit
 	}
 
+	// 每个地址至少保留多少trx手续费
 	if globalConf.Client.MinFee.Cmp(decimal.Zero) > 0 {
 		minFee = globalConf.Client.MinFee
 	}
 
+	// 每次归集每个合约需要手续费消耗
 	if globalConf.Client.PerFee.Cmp(decimal.Zero) > 0 {
 		perFee = globalConf.Client.PerFee
 	}
 
+	// 主钱包地址
 	mainAddr = globalConf.Client.MainAddr
 	mainAccout, err = loadAccountWithUUID(mainAddr, globalConf.Client.Password)
 	if err != nil {
@@ -127,11 +132,13 @@ func Init() {
 		os.Exit(1)
 	}
 
+	// 使用sqlite3数据库
 	dbengine, err = InitDB(globalConf.Client.DBAddr)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
+	// 获取最后一次扫描的高度
 	targetHeight = getlastBlock()
 
 	log.Info("lastblock:", targetHeight)
