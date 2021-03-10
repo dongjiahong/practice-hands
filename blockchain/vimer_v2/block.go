@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"time"
 )
 
@@ -24,27 +22,15 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 		PrevBlockHash: prevBlockHash,
 		MerKelRoot:    []byte{},
 		TimeStamp:     time.Now().Unix(),
-		Bits:          1,
-		Nonce:         1,
+		Bits:          targetBits,
+		Nonce:         0,
 		Data:          []byte(data),
 	}
-	block.SetHash()
+	pow := NewProofOfWork(&block)
+	nonce, hash := pow.Run()
+	block.Nonce = nonce
+	block.Hash = hash
 	return &block
-}
-
-func (block *Block) SetHash() {
-	tmp := [][]byte{
-		IntToByte(block.Version),
-		block.PrevBlockHash,
-		block.MerKelRoot,
-		IntToByte(block.TimeStamp),
-		IntToByte(block.Bits),
-		IntToByte(block.Nonce),
-		block.Data,
-	}
-	data := bytes.Join(tmp, []byte{})
-	hash := sha256.Sum256(data)
-	block.Hash = hash[:]
 }
 
 func NewGenesisBlock() *Block {
