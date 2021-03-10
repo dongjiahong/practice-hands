@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"crypto/sha256"
+	"fmt"
+	"math"
 	"math/big"
 )
 
@@ -20,4 +24,52 @@ func NewProofOfWork(block *Block) *ProofOfWork {
 	target.Lsh(target, uint(256-targetBits)) // 左移256-24=232位
 	pow := ProofOfWork{block: block, target: target}
 	return &pow
+}
+
+func (pow *ProofOfWork) PrepareData(nonce int64) []byte {
+	block := pow.block
+	tmp := [][]byte{
+		IntToByte(block.Version),
+		block.PrevBlockHash,
+		block.MerKelRoot,
+		IntToByte(block.TimeStamp),
+		IntToByte(block.Bits),
+		IntToByte(nonce),
+		block.Data,
+	}
+	data := bytes.Join(tmp, []byte{})
+	return data
+}
+
+func (pow *ProofOfWork) Run() (int64, []byte) {
+	/* 思路
+	1.拼装数据
+	2.哈希值转换成big.Int类型
+	for nonce {
+		hash := sha256(block数据 + nonce)
+		if 转换(hash) < pow.target {
+			找到了
+		} else {
+			nonce
+		}
+	}
+	return nonce, hash[:]
+	*/
+
+	var hash [32]byte
+	var nonce int64 = 0
+	var hashInt big.Int
+	for nonce < math.MaxInt64 {
+		data := pow.PrepareData(nonce)
+		hash = sha256.Sum256(data)
+
+		hashInt.SetBytes(hash[:])
+		if hashInt.Cmp(pow.target) == -1 {
+			fmt.Printf("found nonce, nonce: %d, hash: %x\n", nonce, hash)
+			break
+		} else {
+			nonce++
+		}
+	}
+	return nonce, hash[:]
 }
