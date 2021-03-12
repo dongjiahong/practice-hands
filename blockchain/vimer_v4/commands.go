@@ -2,10 +2,10 @@ package main
 
 import "fmt"
 
-func (cli *CLI) AddBlock(data string) {
-	//bc := GetBlockChainHandler()
-	//bc.AddBlock(data)
-}
+//func (cli *CLI) AddBlock(data string) {
+//bc := GetBlockChainHandler()
+//bc.AddBlock(data)
+//}
 
 func (cli *CLI) PrintChain() {
 	bc := GetBlockChainHandler()
@@ -50,4 +50,13 @@ func (cli *CLI) GetBalance(address string) {
 		total += utxo.Value
 	}
 	fmt.Printf("The balance of %s is %f\n", address, total)
+}
+
+func (cli *CLI) Send(from, to string, amount float64) {
+	bc := GetBlockChainHandler()
+	defer bc.db.Close()
+
+	tx := NewTransaction(from, to, amount, bc)
+	bc.AddBlock([]*Transaction{tx})
+	fmt.Println("send successfully!")
 }

@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
+	"os"
 )
 
 const reward = 12.5
@@ -66,6 +67,48 @@ func (tx *Transaction) IsCoinbase() bool {
 	}
 	return false
 }
-func NewTransaction(form, to string, amount float64, bc *BlockChain) *Transaction {
-	return nil
+func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transaction {
+
+	// map[string][]int64 key:交易id, value:引用output的索引数组
+	validUTXOs := make(map[string][]int64)
+	var total float64
+	validUTXOs /*所需要的，合理的utxo的合集*/, total /*返回utxo的金额总和*/ = bc.FindSuitableUTXOs(from, amount)
+
+	// validUTXOs[0x11111111] = []int64{1}
+	// validUTXOs[0x22222222] = []int64{0}
+	// ....
+	// validUTXOs[0xnnnnnnnn] = []int64{0, 4, 8}
+	if total < amount {
+		fmt.Println("Not enough money!")
+		os.Exit(1)
+	}
+
+	var inputs []TXInput
+	var outputs []TXOutput
+
+	// 1.创建inputs
+	// 进行output到input的转换
+	// 遍历有效的utxo的合集
+	for txId, outputIndexes := range validUTXOs {
+		// 遍历所有引用的utxo的索引，每一个索引需要创建一个input
+		for _, index := range outputIndexes {
+			input := TXInput{[]byte(txId), int64(index), from}
+			inputs = append(inputs, input)
+		}
+	}
+
+	// 2.创建outputs
+	// 给对方支付
+	output := TXOutput{amount, to}
+	outputs = append(outputs, output)
+
+	// 找零
+	if total > amount {
+		output := TXOutput{total - amount, from}
+		outputs = append(outputs, output)
+	}
+
+	tx := Transaction{nil, inputs, outputs}
+	tx.SetTXID()
+	return &tx
 }
