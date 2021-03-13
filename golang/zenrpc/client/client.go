@@ -25,7 +25,7 @@ type Reply struct {
 
 func main() {
 	// 1.链接
-	conn, err := jsonrpc.Dial("tcp", "127.0.0.1:9999")
+	conn, err := jsonrpc.Dial("http", "127.0.0.1:9999")
 	if err != nil {
 		log.Fatal("can't not connect to 127.0.0.1:9999")
 		panic(err)
@@ -34,7 +34,7 @@ func main() {
 	request := Request{
 		ID:      1,
 		Version: "2.0",
-		Method:  "sum",
+		Method:  "multiply",
 		Params:  Param{A: 1, B: 4},
 	}
 

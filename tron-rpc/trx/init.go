@@ -73,14 +73,23 @@ func Init() {
 	keystore, _ = filepath.Abs(globalConf.Client.KeyStore)
 	var err error
 
-	err = InitMainNode(globalConf.Client.NodeTrx)
+	err = InitMainNode(globalConf.Client.NodeTrx) // 只是赋值节点的url
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
 
+	// 将各种节点的url加入变量中 nodeall = append(nodeall, url...)
 	InitAllNode(globalConf.Client.NodeUrl)
 
+	/* 初始化合约
+	for i, v := range contracts {
+		if ok, _ := mapContractType[v.Type]; ok {
+			mapContract[v.Contract] = &contracts[i]
+		} else {
+			return fmt.Errorf("the contract type %s is not exist pleasecheck", v.Type)
+		}
+	} */
 	err = InitContract(globalConf.Contracts)
 	if err != nil {
 		log.Error(err)
