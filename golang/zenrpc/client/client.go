@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"net/rpc/jsonrpc"
+	"net/http"
 )
 
 type Param struct {
@@ -24,27 +27,29 @@ type Reply struct {
 }
 
 func main() {
-	// 1.链接
-	conn, err := jsonrpc.Dial("http", "127.0.0.1:9999")
-	if err != nil {
-		log.Fatal("can't not connect to 127.0.0.1:9999")
-		panic(err)
-	}
 
 	request := Request{
 		ID:      1,
 		Version: "2.0",
 		Method:  "multiply",
-		Params:  Param{A: 1, B: 4},
+		Params:  Param{A: 2, B: 4},
 	}
 
-	//reply := Reply{}
-	var reply Reply
+	jsonStr, _ := json.Marshal(&request)
 
-	// 2.调用
-	if err := conn.Call("arith.sum", request, &reply); err != nil {
-		log.Fatal("call MathService.Add error: ", err)
+	resp, err := http.Post("http://127.0.0.1:9999", "application/json", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		log.Panicln(err)
+	}
+	if resp != nil {
+		defer resp.Body.Close()
 	}
 
-	fmt.Printf("====> %v\n", reply)
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	fmt.Printf("body: %v\n", string(b))
+
 }

@@ -22,5 +22,5 @@ func main() {
 	http.Handle("/", rpc)
 
 	log.Printf("starting arigthsrc on %s", *addr)
-	log.Fatal(http.ListenAndServe(":9999", rpc))
+	log.Fatal(http.ListenAndServe("127.0.0.1:9999", rpc))
 }
