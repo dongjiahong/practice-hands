@@ -23,4 +23,10 @@ rustup component add rls rust-analysis rust-src
 
 cp ./coc-settings.json ~/.config/nvim/coc-settings.json
 # coc 需要用到nodejs，但是系统apt的node版本过低，要去官网下载安装
+# 安装node
+wget https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.xz
+tar -xvJf node-v14.16.0-linux-x64.tar.xz
+sudo mv node-v14.16.0-linux-x64 /usr/local/
+sudo ln -s /usr/local/node-v14.16.0-linux-x64/bin/npm /usr/local/bin/
+sudo ln -s /usr/local/node-v14.16.0-linux-x64/bin/node /usr/local/bin/
 

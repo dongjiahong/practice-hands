@@ -77,3 +77,6 @@ let g:rustfmt_autosave = 1
 
 "------->>>rainbow 彩虹括号<<<-----
 let g:rainbow_active = 1
+
+"------->>>go-vim<<<<------
+nmap <F10> :GoImports <CR>
