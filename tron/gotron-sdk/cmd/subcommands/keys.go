@@ -61,18 +61,27 @@ func keysSub() []*cobra.Command {
 		Short: "Create a new keystore key",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if store.DoesNamedAccountExist(args[0]) {
+			if store.DoesNamedAccountExist(args[0]) { // 判断所给的账户名是否存在
 				return fmt.Errorf("account %s already exists", args[0])
 			}
-			passphrase, err := getPassphraseWithConfirm()
+			passphrase, err := getPassphraseWithConfirm() // 获取密码，默认为""
 			if err != nil {
 				return err
 			}
+			//type Creation struct {
+			//Name               string // 账户名
+			//Passphrase         string // 密码
+			//Mnemonic           string // 助记词
+			//MnemonicPassphrase string // 助记词密码
+			//HdAccountNumber    *uint32
+			//HdIndexNumber      *uint32
+			//}
 			acc := account.Creation{
-				Name:       args[0],
-				Passphrase: passphrase,
+				Name:       args[0],    // 账户名
+				Passphrase: passphrase, // 密码默认为""
 			}
 
+			// 创建新的本地账户, 传入账户名和密码,返回账户
 			if err := account.CreateNewLocalAccount(&acc); err != nil {
 				return err
 			}

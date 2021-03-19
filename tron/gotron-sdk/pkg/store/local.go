@@ -96,8 +96,9 @@ func FromAddress(addr string) *keystore.KeyStore {
 
 // FromAccountName get account from name
 func FromAccountName(name string) *keystore.KeyStore {
-	uDir, _ := homedir.Dir()
-	p := path.Join(uDir, c.DefaultConfigDirName, c.DefaultConfigAccountAliasesDirName, name)
+	uDir, _ := homedir.Dir() // 用户的本地目录，如：/home/lele
+	//uDir: /home/lele; DDefaultLocation: .tronctl; defaultConfigAccountAliasesDireName:  account_keys
+	p := path.Join(uDir, c.DefaultConfigDirName, c.DefaultConfigAccountAliasesDirName, name) // /home/lele/.tronctl/account_keys/vimer
 	return keystore.ForPath(p)
 }
 

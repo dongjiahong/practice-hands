@@ -7,10 +7,10 @@
 [client]
 nodeTrx="grpc.shasta.trongrid.io:50051" # fullnode 主节点
 nodeUrl=[] # fullnode 其他节点
-main_addr="TDRPyn57F4riYTJFcHaQbrzgFaGe8HSumL" #主钱包地址
-password="1070fcd0-ed20-425d-af1f-6d217d2e4820" #主钱包秘钥加密前的密码 uuid
-key_store="/home/user/tron/key_store" #用户秘钥保存路径 从运行文件路径开始算 默认 key_store
-db_addr="/home/user/tron/trx.db"
+main_addr="TSD7whaWMbGrL6CPUfkJ9LdXdDbYy2EroJ" #主钱包地址
+password="d92c9734-dd57-4ee4-8747-e3cf8c5a9f75" #主钱包秘钥加密前的密码 uuid
+key_store="/home/lele/develop/practice-hands/tron/tron-rpc/key_store/" #用户秘钥保存路径 从运行文件路径开始算 默认 key_store
+db_addr="/home/lele/develop/practice-hands/tron/tron-rpc/trx.db"
 port="9291"
 logLevel="info" # 日志等级默认
 

@@ -5,4 +5,4 @@
 # protoc-gen-xxx命名的可执行程序，最终通过查询到的插件生成代码。对于Go语言的protoc-gen-go插件来说，
 # 里面又实现了一层静态插件系统。比如protoc-gen-go内置了一个gRPC插件，
 # 用户可以通过--go_out=plugins=grpc参数来生成gRPC相关代码，否则只会针对message生成相关代码。
-protoc -I . --go_out=plugins=grpc:. hello.proto
+protoc -I . --go_out=plugins=grpc:. ./hello.proto

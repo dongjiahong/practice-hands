@@ -23,7 +23,8 @@ debug:
 	$(env) go build $(flags) -o $(cli) -ldflags="$(ldflags)" cmd/main.go
 
 install:all
-	cp $(cli) ~/.local/bin
+	mkdir -p ~/.local/bin
+	cp $(cli) ~/.local/bin/
 
 clean:
 	@rm -f $(cli)

@@ -235,12 +235,12 @@ func getConfig() []byte {
 # grpc.shasta.trongrid.io:50051
 [client]
 nodeTrx="grpc.trongrid.io:50051"
-main_addr="TQCknYutmcMxGoq32JqQWvn1MzyRfuQirC" #主钱包地址
-password="eb1804aa-fa7d-4782-8145-afe4da83c56d" #主钱包秘钥加密前的密码 uuid
+main_addr="TSD7whaWMbGrL6CPUfkJ9LdXdDbYy2EroJ" #主钱包地址
+password="" #主钱包秘钥加密前的密码 uuid
 #THqoopDxSfDSUu4G7EqAYX1CdmjXDZMWNG
 #bf8926a4-767e-4734-a74c-0511cf997b17
-key_store="D:/go/src/tron/trx/key_store" #用户秘钥保存路径 从运行文件路径开始算 默认 key_store
-db_addr="D:/go/src/tron/trx/trx.db"
+key_store="/home/lele/develop/practice-hands/tron/tron-rpc/key_store/" #用户秘钥保存路径 从运行文件路径开始算 默认 key_store
+db_addr="/home/lele/develop/practice-hands/tron/tron-rpc/trx.db"
 port="9291"
 logLevel="info" # 日志等级默认
 feelimit=2000000
