@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserBuyRecord is the client for interacting with the UserBuyRecord builders.
+	UserBuyRecord *UserBuyRecordClient
 	// UserCount is the client for interacting with the UserCount builders.
 	UserCount *UserCountClient
 
@@ -152,6 +154,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.User = NewUserClient(tx.config)
+	tx.UserBuyRecord = NewUserBuyRecordClient(tx.config)
 	tx.UserCount = NewUserCountClient(tx.config)
 }
 

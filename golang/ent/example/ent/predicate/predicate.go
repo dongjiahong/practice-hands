@@ -9,5 +9,8 @@ import (
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
 
+// UserBuyRecord is the predicate function for userbuyrecord builders.
+type UserBuyRecord func(*sql.Selector)
+
 // UserCount is the predicate function for usercount builders.
 type UserCount func(*sql.Selector)

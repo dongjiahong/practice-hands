@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"sqlent/ent/user"
+	"sqlent/ent/usercount"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
@@ -39,19 +40,35 @@ type User struct {
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
 	// Count holds the value of the count edge.
-	Count []*UserCount `json:"count,omitempty"`
+	Count *UserCount `json:"count,omitempty"`
+	// BuyRecord holds the value of the buy_record edge.
+	BuyRecord []*UserBuyRecord `json:"buy_record,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // CountOrErr returns the Count value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) CountOrErr() ([]*UserCount, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) CountOrErr() (*UserCount, error) {
 	if e.loadedTypes[0] {
+		if e.Count == nil {
+			// The edge count was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: usercount.Label}
+		}
 		return e.Count, nil
 	}
 	return nil, &NotLoadedError{edge: "count"}
+}
+
+// BuyRecordOrErr returns the BuyRecord value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) BuyRecordOrErr() ([]*UserBuyRecord, error) {
+	if e.loadedTypes[1] {
+		return e.BuyRecord, nil
+	}
+	return nil, &NotLoadedError{edge: "buy_record"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -134,6 +151,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 // QueryCount queries the "count" edge of the User entity.
 func (u *User) QueryCount() *UserCountQuery {
 	return (&UserClient{config: u.config}).QueryCount(u)
+}
+
+// QueryBuyRecord queries the "buy_record" edge of the User entity.
+func (u *User) QueryBuyRecord() *UserBuyRecordQuery {
+	return (&UserClient{config: u.config}).QueryBuyRecord(u)
 }
 
 // Update returns a builder for updating this User.

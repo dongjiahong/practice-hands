@@ -21,6 +21,19 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return f(ctx, mv)
 }
 
+// The UserBuyRecordFunc type is an adapter to allow the use of ordinary
+// function as UserBuyRecord mutator.
+type UserBuyRecordFunc func(context.Context, *ent.UserBuyRecordMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserBuyRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.UserBuyRecordMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserBuyRecordMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserCountFunc type is an adapter to allow the use of ordinary
 // function as UserCount mutator.
 type UserCountFunc func(context.Context, *ent.UserCountMutation) (ent.Value, error)

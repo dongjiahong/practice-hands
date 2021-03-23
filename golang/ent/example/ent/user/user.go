@@ -23,6 +23,8 @@ const (
 	FieldDeleted = "deleted"
 	// EdgeCount holds the string denoting the count edge name in mutations.
 	EdgeCount = "count"
+	// EdgeBuyRecord holds the string denoting the buy_record edge name in mutations.
+	EdgeBuyRecord = "buy_record"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// CountTable is the table the holds the count relation/edge.
@@ -32,6 +34,13 @@ const (
 	CountInverseTable = "user_counts"
 	// CountColumn is the table column denoting the count relation/edge.
 	CountColumn = "user_id"
+	// BuyRecordTable is the table the holds the buy_record relation/edge.
+	BuyRecordTable = "user_buy_records"
+	// BuyRecordInverseTable is the table name for the UserBuyRecord entity.
+	// It exists in this package in order to avoid circular dependency with the "userbuyrecord" package.
+	BuyRecordInverseTable = "user_buy_records"
+	// BuyRecordColumn is the table column denoting the buy_record relation/edge.
+	BuyRecordColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.

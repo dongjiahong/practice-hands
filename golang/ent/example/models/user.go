@@ -2,11 +2,9 @@ package models
 
 import (
 	"context"
-	"fmt"
 
 	"sqlent/ent"
 	"sqlent/ent/user"
-	"sqlent/ent/usercount"
 )
 
 type UserDao struct {
@@ -42,24 +40,18 @@ func (d *UserDao) UpdateUser(ctx context.Context, u *ent.User) (*ent.User, error
 
 func (d *UserDao) AddUserCount(ctx context.Context, u *ent.User, uc *ent.UserCount) (*ent.User, error) {
 	return d.conn.User.UpdateOneID(u.ID).
-		AddCount(uc).
 		Save(ctx)
 }
 
-func (d *UserDao) GetUserWithCount(ctx context.Context, id int64) ([]*ent.User, error) {
-	x, err := d.conn.User.
+func (d *UserDao) GetUserWithAll(ctx context.Context, id int64) (*ent.User, error) {
+	user, err := d.conn.User.
 		Query().
-		//WithCount().
-		WithCount(func(q *ent.UserCountQuery) {
-			q.Select(usercount.FieldLevel)
-		}).
-		All(ctx)
+		Where(
+			user.IDEQ(id),
+		).
+		WithCount().
+		WithBuyRecord().
+		Only(ctx)
 
-	for _, u := range x {
-		fmt.Printf("===>  u: %+v\n", *u)
-		for _, p := range u.Edges.Count {
-			fmt.Println("===>> count: ", p)
-		}
-	}
-	return x, err
+	return user, err
 }

@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"sqlent/ent/predicate"
 	"sqlent/ent/user"
+	"sqlent/ent/userbuyrecord"
 	"sqlent/ent/usercount"
 	"sync"
 
 	"entgo.io/ent"
+	"github.com/google/uuid"
 )
 
 const (
@@ -22,34 +24,37 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeUser      = "User"
-	TypeUserCount = "UserCount"
+	TypeUser          = "User"
+	TypeUserBuyRecord = "UserBuyRecord"
+	TypeUserCount     = "UserCount"
 )
 
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	phone         *string
-	password      *string
-	p_id          *int
-	addp_id       *int
-	invited_code  *string
-	created       *int64
-	addcreated    *int64
-	updated       *int64
-	addupdated    *int64
-	deleted       *int64
-	adddeleted    *int64
-	clearedFields map[string]struct{}
-	count         map[int]struct{}
-	removedcount  map[int]struct{}
-	clearedcount  bool
-	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	op                Op
+	typ               string
+	id                *int64
+	phone             *string
+	password          *string
+	p_id              *int
+	addp_id           *int
+	invited_code      *string
+	created           *int64
+	addcreated        *int64
+	updated           *int64
+	addupdated        *int64
+	deleted           *int64
+	adddeleted        *int64
+	clearedFields     map[string]struct{}
+	count             *int
+	clearedcount      bool
+	buy_record        map[uuid.UUID]struct{}
+	removedbuy_record map[uuid.UUID]struct{}
+	clearedbuy_record bool
+	done              bool
+	oldValue          func(context.Context) (*User, error)
+	predicates        []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -469,14 +474,9 @@ func (m *UserMutation) ResetDeleted() {
 	m.adddeleted = nil
 }
 
-// AddCountIDs adds the "count" edge to the UserCount entity by ids.
-func (m *UserMutation) AddCountIDs(ids ...int) {
-	if m.count == nil {
-		m.count = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.count[ids[i]] = struct{}{}
-	}
+// SetCountID sets the "count" edge to the UserCount entity by id.
+func (m *UserMutation) SetCountID(id int) {
+	m.count = &id
 }
 
 // ClearCount clears the "count" edge to the UserCount entity.
@@ -489,28 +489,20 @@ func (m *UserMutation) CountCleared() bool {
 	return m.clearedcount
 }
 
-// RemoveCountIDs removes the "count" edge to the UserCount entity by IDs.
-func (m *UserMutation) RemoveCountIDs(ids ...int) {
-	if m.removedcount == nil {
-		m.removedcount = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedcount[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedCount returns the removed IDs of the "count" edge to the UserCount entity.
-func (m *UserMutation) RemovedCountIDs() (ids []int) {
-	for id := range m.removedcount {
-		ids = append(ids, id)
+// CountID returns the "count" edge ID in the mutation.
+func (m *UserMutation) CountID() (id int, exists bool) {
+	if m.count != nil {
+		return *m.count, true
 	}
 	return
 }
 
 // CountIDs returns the "count" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CountID instead. It exists only for internal usage by the builders.
 func (m *UserMutation) CountIDs() (ids []int) {
-	for id := range m.count {
-		ids = append(ids, id)
+	if id := m.count; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -519,7 +511,59 @@ func (m *UserMutation) CountIDs() (ids []int) {
 func (m *UserMutation) ResetCount() {
 	m.count = nil
 	m.clearedcount = false
-	m.removedcount = nil
+}
+
+// AddBuyRecordIDs adds the "buy_record" edge to the UserBuyRecord entity by ids.
+func (m *UserMutation) AddBuyRecordIDs(ids ...uuid.UUID) {
+	if m.buy_record == nil {
+		m.buy_record = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.buy_record[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBuyRecord clears the "buy_record" edge to the UserBuyRecord entity.
+func (m *UserMutation) ClearBuyRecord() {
+	m.clearedbuy_record = true
+}
+
+// BuyRecordCleared returns if the "buy_record" edge to the UserBuyRecord entity was cleared.
+func (m *UserMutation) BuyRecordCleared() bool {
+	return m.clearedbuy_record
+}
+
+// RemoveBuyRecordIDs removes the "buy_record" edge to the UserBuyRecord entity by IDs.
+func (m *UserMutation) RemoveBuyRecordIDs(ids ...uuid.UUID) {
+	if m.removedbuy_record == nil {
+		m.removedbuy_record = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.removedbuy_record[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBuyRecord returns the removed IDs of the "buy_record" edge to the UserBuyRecord entity.
+func (m *UserMutation) RemovedBuyRecordIDs() (ids []uuid.UUID) {
+	for id := range m.removedbuy_record {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BuyRecordIDs returns the "buy_record" edge IDs in the mutation.
+func (m *UserMutation) BuyRecordIDs() (ids []uuid.UUID) {
+	for id := range m.buy_record {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBuyRecord resets all changes to the "buy_record" edge.
+func (m *UserMutation) ResetBuyRecord() {
+	m.buy_record = nil
+	m.clearedbuy_record = false
+	m.removedbuy_record = nil
 }
 
 // Op returns the operation name.
@@ -788,9 +832,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.count != nil {
 		edges = append(edges, user.EdgeCount)
+	}
+	if m.buy_record != nil {
+		edges = append(edges, user.EdgeBuyRecord)
 	}
 	return edges
 }
@@ -800,8 +847,12 @@ func (m *UserMutation) AddedEdges() []string {
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case user.EdgeCount:
-		ids := make([]ent.Value, 0, len(m.count))
-		for id := range m.count {
+		if id := m.count; id != nil {
+			return []ent.Value{*id}
+		}
+	case user.EdgeBuyRecord:
+		ids := make([]ent.Value, 0, len(m.buy_record))
+		for id := range m.buy_record {
 			ids = append(ids, id)
 		}
 		return ids
@@ -811,9 +862,9 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedcount != nil {
-		edges = append(edges, user.EdgeCount)
+	edges := make([]string, 0, 2)
+	if m.removedbuy_record != nil {
+		edges = append(edges, user.EdgeBuyRecord)
 	}
 	return edges
 }
@@ -822,9 +873,9 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeCount:
-		ids := make([]ent.Value, 0, len(m.removedcount))
-		for id := range m.removedcount {
+	case user.EdgeBuyRecord:
+		ids := make([]ent.Value, 0, len(m.removedbuy_record))
+		for id := range m.removedbuy_record {
 			ids = append(ids, id)
 		}
 		return ids
@@ -834,9 +885,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedcount {
 		edges = append(edges, user.EdgeCount)
+	}
+	if m.clearedbuy_record {
+		edges = append(edges, user.EdgeBuyRecord)
 	}
 	return edges
 }
@@ -847,6 +901,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeCount:
 		return m.clearedcount
+	case user.EdgeBuyRecord:
+		return m.clearedbuy_record
 	}
 	return false
 }
@@ -855,6 +911,9 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *UserMutation) ClearEdge(name string) error {
 	switch name {
+	case user.EdgeCount:
+		m.ClearCount()
+		return nil
 	}
 	return fmt.Errorf("unknown User unique edge %s", name)
 }
@@ -866,8 +925,1213 @@ func (m *UserMutation) ResetEdge(name string) error {
 	case user.EdgeCount:
 		m.ResetCount()
 		return nil
+	case user.EdgeBuyRecord:
+		m.ResetBuyRecord()
+		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
+}
+
+// UserBuyRecordMutation represents an operation that mutates the UserBuyRecord nodes in the graph.
+type UserBuyRecordMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *uuid.UUID
+	power          *int
+	addpower       *int
+	power_num      *int
+	addpower_num   *int
+	total_power    *float64
+	addtotal_power *float64
+	total_day      *int
+	addtotal_day   *int
+	remain_day     *int
+	addremain_day  *int
+	node           *string
+	used_usdt      *float64
+	addused_usdt   *float64
+	buy_date       *string
+	created        *int64
+	addcreated     *int64
+	updated        *int64
+	addupdated     *int64
+	deleted        *int64
+	adddeleted     *int64
+	clearedFields  map[string]struct{}
+	owner          *int64
+	clearedowner   bool
+	done           bool
+	oldValue       func(context.Context) (*UserBuyRecord, error)
+	predicates     []predicate.UserBuyRecord
+}
+
+var _ ent.Mutation = (*UserBuyRecordMutation)(nil)
+
+// userbuyrecordOption allows management of the mutation configuration using functional options.
+type userbuyrecordOption func(*UserBuyRecordMutation)
+
+// newUserBuyRecordMutation creates new mutation for the UserBuyRecord entity.
+func newUserBuyRecordMutation(c config, op Op, opts ...userbuyrecordOption) *UserBuyRecordMutation {
+	m := &UserBuyRecordMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeUserBuyRecord,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withUserBuyRecordID sets the ID field of the mutation.
+func withUserBuyRecordID(id uuid.UUID) userbuyrecordOption {
+	return func(m *UserBuyRecordMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *UserBuyRecord
+		)
+		m.oldValue = func(ctx context.Context) (*UserBuyRecord, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().UserBuyRecord.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withUserBuyRecord sets the old UserBuyRecord of the mutation.
+func withUserBuyRecord(node *UserBuyRecord) userbuyrecordOption {
+	return func(m *UserBuyRecordMutation) {
+		m.oldValue = func(context.Context) (*UserBuyRecord, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m UserBuyRecordMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m UserBuyRecordMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of UserBuyRecord entities.
+func (m *UserBuyRecordMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *UserBuyRecordMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetPower sets the "power" field.
+func (m *UserBuyRecordMutation) SetPower(i int) {
+	m.power = &i
+	m.addpower = nil
+}
+
+// Power returns the value of the "power" field in the mutation.
+func (m *UserBuyRecordMutation) Power() (r int, exists bool) {
+	v := m.power
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPower returns the old "power" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldPower(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPower is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPower requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPower: %w", err)
+	}
+	return oldValue.Power, nil
+}
+
+// AddPower adds i to the "power" field.
+func (m *UserBuyRecordMutation) AddPower(i int) {
+	if m.addpower != nil {
+		*m.addpower += i
+	} else {
+		m.addpower = &i
+	}
+}
+
+// AddedPower returns the value that was added to the "power" field in this mutation.
+func (m *UserBuyRecordMutation) AddedPower() (r int, exists bool) {
+	v := m.addpower
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPower resets all changes to the "power" field.
+func (m *UserBuyRecordMutation) ResetPower() {
+	m.power = nil
+	m.addpower = nil
+}
+
+// SetPowerNum sets the "power_num" field.
+func (m *UserBuyRecordMutation) SetPowerNum(i int) {
+	m.power_num = &i
+	m.addpower_num = nil
+}
+
+// PowerNum returns the value of the "power_num" field in the mutation.
+func (m *UserBuyRecordMutation) PowerNum() (r int, exists bool) {
+	v := m.power_num
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPowerNum returns the old "power_num" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldPowerNum(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPowerNum is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPowerNum requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPowerNum: %w", err)
+	}
+	return oldValue.PowerNum, nil
+}
+
+// AddPowerNum adds i to the "power_num" field.
+func (m *UserBuyRecordMutation) AddPowerNum(i int) {
+	if m.addpower_num != nil {
+		*m.addpower_num += i
+	} else {
+		m.addpower_num = &i
+	}
+}
+
+// AddedPowerNum returns the value that was added to the "power_num" field in this mutation.
+func (m *UserBuyRecordMutation) AddedPowerNum() (r int, exists bool) {
+	v := m.addpower_num
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPowerNum resets all changes to the "power_num" field.
+func (m *UserBuyRecordMutation) ResetPowerNum() {
+	m.power_num = nil
+	m.addpower_num = nil
+}
+
+// SetTotalPower sets the "total_power" field.
+func (m *UserBuyRecordMutation) SetTotalPower(f float64) {
+	m.total_power = &f
+	m.addtotal_power = nil
+}
+
+// TotalPower returns the value of the "total_power" field in the mutation.
+func (m *UserBuyRecordMutation) TotalPower() (r float64, exists bool) {
+	v := m.total_power
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalPower returns the old "total_power" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldTotalPower(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTotalPower is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTotalPower requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalPower: %w", err)
+	}
+	return oldValue.TotalPower, nil
+}
+
+// AddTotalPower adds f to the "total_power" field.
+func (m *UserBuyRecordMutation) AddTotalPower(f float64) {
+	if m.addtotal_power != nil {
+		*m.addtotal_power += f
+	} else {
+		m.addtotal_power = &f
+	}
+}
+
+// AddedTotalPower returns the value that was added to the "total_power" field in this mutation.
+func (m *UserBuyRecordMutation) AddedTotalPower() (r float64, exists bool) {
+	v := m.addtotal_power
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalPower resets all changes to the "total_power" field.
+func (m *UserBuyRecordMutation) ResetTotalPower() {
+	m.total_power = nil
+	m.addtotal_power = nil
+}
+
+// SetTotalDay sets the "total_day" field.
+func (m *UserBuyRecordMutation) SetTotalDay(i int) {
+	m.total_day = &i
+	m.addtotal_day = nil
+}
+
+// TotalDay returns the value of the "total_day" field in the mutation.
+func (m *UserBuyRecordMutation) TotalDay() (r int, exists bool) {
+	v := m.total_day
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalDay returns the old "total_day" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldTotalDay(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTotalDay is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTotalDay requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalDay: %w", err)
+	}
+	return oldValue.TotalDay, nil
+}
+
+// AddTotalDay adds i to the "total_day" field.
+func (m *UserBuyRecordMutation) AddTotalDay(i int) {
+	if m.addtotal_day != nil {
+		*m.addtotal_day += i
+	} else {
+		m.addtotal_day = &i
+	}
+}
+
+// AddedTotalDay returns the value that was added to the "total_day" field in this mutation.
+func (m *UserBuyRecordMutation) AddedTotalDay() (r int, exists bool) {
+	v := m.addtotal_day
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalDay resets all changes to the "total_day" field.
+func (m *UserBuyRecordMutation) ResetTotalDay() {
+	m.total_day = nil
+	m.addtotal_day = nil
+}
+
+// SetRemainDay sets the "remain_day" field.
+func (m *UserBuyRecordMutation) SetRemainDay(i int) {
+	m.remain_day = &i
+	m.addremain_day = nil
+}
+
+// RemainDay returns the value of the "remain_day" field in the mutation.
+func (m *UserBuyRecordMutation) RemainDay() (r int, exists bool) {
+	v := m.remain_day
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemainDay returns the old "remain_day" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldRemainDay(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldRemainDay is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldRemainDay requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemainDay: %w", err)
+	}
+	return oldValue.RemainDay, nil
+}
+
+// AddRemainDay adds i to the "remain_day" field.
+func (m *UserBuyRecordMutation) AddRemainDay(i int) {
+	if m.addremain_day != nil {
+		*m.addremain_day += i
+	} else {
+		m.addremain_day = &i
+	}
+}
+
+// AddedRemainDay returns the value that was added to the "remain_day" field in this mutation.
+func (m *UserBuyRecordMutation) AddedRemainDay() (r int, exists bool) {
+	v := m.addremain_day
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRemainDay resets all changes to the "remain_day" field.
+func (m *UserBuyRecordMutation) ResetRemainDay() {
+	m.remain_day = nil
+	m.addremain_day = nil
+}
+
+// SetNode sets the "node" field.
+func (m *UserBuyRecordMutation) SetNode(s string) {
+	m.node = &s
+}
+
+// Node returns the value of the "node" field in the mutation.
+func (m *UserBuyRecordMutation) Node() (r string, exists bool) {
+	v := m.node
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNode returns the old "node" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldNode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldNode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldNode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNode: %w", err)
+	}
+	return oldValue.Node, nil
+}
+
+// ResetNode resets all changes to the "node" field.
+func (m *UserBuyRecordMutation) ResetNode() {
+	m.node = nil
+}
+
+// SetUsedUsdt sets the "used_usdt" field.
+func (m *UserBuyRecordMutation) SetUsedUsdt(f float64) {
+	m.used_usdt = &f
+	m.addused_usdt = nil
+}
+
+// UsedUsdt returns the value of the "used_usdt" field in the mutation.
+func (m *UserBuyRecordMutation) UsedUsdt() (r float64, exists bool) {
+	v := m.used_usdt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUsedUsdt returns the old "used_usdt" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldUsedUsdt(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUsedUsdt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUsedUsdt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUsedUsdt: %w", err)
+	}
+	return oldValue.UsedUsdt, nil
+}
+
+// AddUsedUsdt adds f to the "used_usdt" field.
+func (m *UserBuyRecordMutation) AddUsedUsdt(f float64) {
+	if m.addused_usdt != nil {
+		*m.addused_usdt += f
+	} else {
+		m.addused_usdt = &f
+	}
+}
+
+// AddedUsedUsdt returns the value that was added to the "used_usdt" field in this mutation.
+func (m *UserBuyRecordMutation) AddedUsedUsdt() (r float64, exists bool) {
+	v := m.addused_usdt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUsedUsdt resets all changes to the "used_usdt" field.
+func (m *UserBuyRecordMutation) ResetUsedUsdt() {
+	m.used_usdt = nil
+	m.addused_usdt = nil
+}
+
+// SetBuyDate sets the "buy_date" field.
+func (m *UserBuyRecordMutation) SetBuyDate(s string) {
+	m.buy_date = &s
+}
+
+// BuyDate returns the value of the "buy_date" field in the mutation.
+func (m *UserBuyRecordMutation) BuyDate() (r string, exists bool) {
+	v := m.buy_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBuyDate returns the old "buy_date" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldBuyDate(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldBuyDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldBuyDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBuyDate: %w", err)
+	}
+	return oldValue.BuyDate, nil
+}
+
+// ResetBuyDate resets all changes to the "buy_date" field.
+func (m *UserBuyRecordMutation) ResetBuyDate() {
+	m.buy_date = nil
+}
+
+// SetCreated sets the "created" field.
+func (m *UserBuyRecordMutation) SetCreated(i int64) {
+	m.created = &i
+	m.addcreated = nil
+}
+
+// Created returns the value of the "created" field in the mutation.
+func (m *UserBuyRecordMutation) Created() (r int64, exists bool) {
+	v := m.created
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreated returns the old "created" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldCreated(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreated is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreated requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreated: %w", err)
+	}
+	return oldValue.Created, nil
+}
+
+// AddCreated adds i to the "created" field.
+func (m *UserBuyRecordMutation) AddCreated(i int64) {
+	if m.addcreated != nil {
+		*m.addcreated += i
+	} else {
+		m.addcreated = &i
+	}
+}
+
+// AddedCreated returns the value that was added to the "created" field in this mutation.
+func (m *UserBuyRecordMutation) AddedCreated() (r int64, exists bool) {
+	v := m.addcreated
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreated resets all changes to the "created" field.
+func (m *UserBuyRecordMutation) ResetCreated() {
+	m.created = nil
+	m.addcreated = nil
+}
+
+// SetUpdated sets the "updated" field.
+func (m *UserBuyRecordMutation) SetUpdated(i int64) {
+	m.updated = &i
+	m.addupdated = nil
+}
+
+// Updated returns the value of the "updated" field in the mutation.
+func (m *UserBuyRecordMutation) Updated() (r int64, exists bool) {
+	v := m.updated
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdated returns the old "updated" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldUpdated(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdated is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdated requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdated: %w", err)
+	}
+	return oldValue.Updated, nil
+}
+
+// AddUpdated adds i to the "updated" field.
+func (m *UserBuyRecordMutation) AddUpdated(i int64) {
+	if m.addupdated != nil {
+		*m.addupdated += i
+	} else {
+		m.addupdated = &i
+	}
+}
+
+// AddedUpdated returns the value that was added to the "updated" field in this mutation.
+func (m *UserBuyRecordMutation) AddedUpdated() (r int64, exists bool) {
+	v := m.addupdated
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdated resets all changes to the "updated" field.
+func (m *UserBuyRecordMutation) ResetUpdated() {
+	m.updated = nil
+	m.addupdated = nil
+}
+
+// SetDeleted sets the "deleted" field.
+func (m *UserBuyRecordMutation) SetDeleted(i int64) {
+	m.deleted = &i
+	m.adddeleted = nil
+}
+
+// Deleted returns the value of the "deleted" field in the mutation.
+func (m *UserBuyRecordMutation) Deleted() (r int64, exists bool) {
+	v := m.deleted
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleted returns the old "deleted" field's value of the UserBuyRecord entity.
+// If the UserBuyRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserBuyRecordMutation) OldDeleted(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeleted is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeleted requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleted: %w", err)
+	}
+	return oldValue.Deleted, nil
+}
+
+// AddDeleted adds i to the "deleted" field.
+func (m *UserBuyRecordMutation) AddDeleted(i int64) {
+	if m.adddeleted != nil {
+		*m.adddeleted += i
+	} else {
+		m.adddeleted = &i
+	}
+}
+
+// AddedDeleted returns the value that was added to the "deleted" field in this mutation.
+func (m *UserBuyRecordMutation) AddedDeleted() (r int64, exists bool) {
+	v := m.adddeleted
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleted resets all changes to the "deleted" field.
+func (m *UserBuyRecordMutation) ResetDeleted() {
+	m.deleted = nil
+	m.adddeleted = nil
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by id.
+func (m *UserBuyRecordMutation) SetOwnerID(id int64) {
+	m.owner = &id
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (m *UserBuyRecordMutation) ClearOwner() {
+	m.clearedowner = true
+}
+
+// OwnerCleared returns if the "owner" edge to the User entity was cleared.
+func (m *UserBuyRecordMutation) OwnerCleared() bool {
+	return m.clearedowner
+}
+
+// OwnerID returns the "owner" edge ID in the mutation.
+func (m *UserBuyRecordMutation) OwnerID() (id int64, exists bool) {
+	if m.owner != nil {
+		return *m.owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *UserBuyRecordMutation) OwnerIDs() (ids []int64) {
+	if id := m.owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "owner" edge.
+func (m *UserBuyRecordMutation) ResetOwner() {
+	m.owner = nil
+	m.clearedowner = false
+}
+
+// Op returns the operation name.
+func (m *UserBuyRecordMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (UserBuyRecord).
+func (m *UserBuyRecordMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *UserBuyRecordMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.power != nil {
+		fields = append(fields, userbuyrecord.FieldPower)
+	}
+	if m.power_num != nil {
+		fields = append(fields, userbuyrecord.FieldPowerNum)
+	}
+	if m.total_power != nil {
+		fields = append(fields, userbuyrecord.FieldTotalPower)
+	}
+	if m.total_day != nil {
+		fields = append(fields, userbuyrecord.FieldTotalDay)
+	}
+	if m.remain_day != nil {
+		fields = append(fields, userbuyrecord.FieldRemainDay)
+	}
+	if m.node != nil {
+		fields = append(fields, userbuyrecord.FieldNode)
+	}
+	if m.used_usdt != nil {
+		fields = append(fields, userbuyrecord.FieldUsedUsdt)
+	}
+	if m.buy_date != nil {
+		fields = append(fields, userbuyrecord.FieldBuyDate)
+	}
+	if m.created != nil {
+		fields = append(fields, userbuyrecord.FieldCreated)
+	}
+	if m.updated != nil {
+		fields = append(fields, userbuyrecord.FieldUpdated)
+	}
+	if m.deleted != nil {
+		fields = append(fields, userbuyrecord.FieldDeleted)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *UserBuyRecordMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case userbuyrecord.FieldPower:
+		return m.Power()
+	case userbuyrecord.FieldPowerNum:
+		return m.PowerNum()
+	case userbuyrecord.FieldTotalPower:
+		return m.TotalPower()
+	case userbuyrecord.FieldTotalDay:
+		return m.TotalDay()
+	case userbuyrecord.FieldRemainDay:
+		return m.RemainDay()
+	case userbuyrecord.FieldNode:
+		return m.Node()
+	case userbuyrecord.FieldUsedUsdt:
+		return m.UsedUsdt()
+	case userbuyrecord.FieldBuyDate:
+		return m.BuyDate()
+	case userbuyrecord.FieldCreated:
+		return m.Created()
+	case userbuyrecord.FieldUpdated:
+		return m.Updated()
+	case userbuyrecord.FieldDeleted:
+		return m.Deleted()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *UserBuyRecordMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case userbuyrecord.FieldPower:
+		return m.OldPower(ctx)
+	case userbuyrecord.FieldPowerNum:
+		return m.OldPowerNum(ctx)
+	case userbuyrecord.FieldTotalPower:
+		return m.OldTotalPower(ctx)
+	case userbuyrecord.FieldTotalDay:
+		return m.OldTotalDay(ctx)
+	case userbuyrecord.FieldRemainDay:
+		return m.OldRemainDay(ctx)
+	case userbuyrecord.FieldNode:
+		return m.OldNode(ctx)
+	case userbuyrecord.FieldUsedUsdt:
+		return m.OldUsedUsdt(ctx)
+	case userbuyrecord.FieldBuyDate:
+		return m.OldBuyDate(ctx)
+	case userbuyrecord.FieldCreated:
+		return m.OldCreated(ctx)
+	case userbuyrecord.FieldUpdated:
+		return m.OldUpdated(ctx)
+	case userbuyrecord.FieldDeleted:
+		return m.OldDeleted(ctx)
+	}
+	return nil, fmt.Errorf("unknown UserBuyRecord field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserBuyRecordMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case userbuyrecord.FieldPower:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPower(v)
+		return nil
+	case userbuyrecord.FieldPowerNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPowerNum(v)
+		return nil
+	case userbuyrecord.FieldTotalPower:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalPower(v)
+		return nil
+	case userbuyrecord.FieldTotalDay:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalDay(v)
+		return nil
+	case userbuyrecord.FieldRemainDay:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemainDay(v)
+		return nil
+	case userbuyrecord.FieldNode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNode(v)
+		return nil
+	case userbuyrecord.FieldUsedUsdt:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUsedUsdt(v)
+		return nil
+	case userbuyrecord.FieldBuyDate:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBuyDate(v)
+		return nil
+	case userbuyrecord.FieldCreated:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreated(v)
+		return nil
+	case userbuyrecord.FieldUpdated:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdated(v)
+		return nil
+	case userbuyrecord.FieldDeleted:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleted(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UserBuyRecord field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *UserBuyRecordMutation) AddedFields() []string {
+	var fields []string
+	if m.addpower != nil {
+		fields = append(fields, userbuyrecord.FieldPower)
+	}
+	if m.addpower_num != nil {
+		fields = append(fields, userbuyrecord.FieldPowerNum)
+	}
+	if m.addtotal_power != nil {
+		fields = append(fields, userbuyrecord.FieldTotalPower)
+	}
+	if m.addtotal_day != nil {
+		fields = append(fields, userbuyrecord.FieldTotalDay)
+	}
+	if m.addremain_day != nil {
+		fields = append(fields, userbuyrecord.FieldRemainDay)
+	}
+	if m.addused_usdt != nil {
+		fields = append(fields, userbuyrecord.FieldUsedUsdt)
+	}
+	if m.addcreated != nil {
+		fields = append(fields, userbuyrecord.FieldCreated)
+	}
+	if m.addupdated != nil {
+		fields = append(fields, userbuyrecord.FieldUpdated)
+	}
+	if m.adddeleted != nil {
+		fields = append(fields, userbuyrecord.FieldDeleted)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *UserBuyRecordMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case userbuyrecord.FieldPower:
+		return m.AddedPower()
+	case userbuyrecord.FieldPowerNum:
+		return m.AddedPowerNum()
+	case userbuyrecord.FieldTotalPower:
+		return m.AddedTotalPower()
+	case userbuyrecord.FieldTotalDay:
+		return m.AddedTotalDay()
+	case userbuyrecord.FieldRemainDay:
+		return m.AddedRemainDay()
+	case userbuyrecord.FieldUsedUsdt:
+		return m.AddedUsedUsdt()
+	case userbuyrecord.FieldCreated:
+		return m.AddedCreated()
+	case userbuyrecord.FieldUpdated:
+		return m.AddedUpdated()
+	case userbuyrecord.FieldDeleted:
+		return m.AddedDeleted()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserBuyRecordMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case userbuyrecord.FieldPower:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPower(v)
+		return nil
+	case userbuyrecord.FieldPowerNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPowerNum(v)
+		return nil
+	case userbuyrecord.FieldTotalPower:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalPower(v)
+		return nil
+	case userbuyrecord.FieldTotalDay:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalDay(v)
+		return nil
+	case userbuyrecord.FieldRemainDay:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRemainDay(v)
+		return nil
+	case userbuyrecord.FieldUsedUsdt:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUsedUsdt(v)
+		return nil
+	case userbuyrecord.FieldCreated:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreated(v)
+		return nil
+	case userbuyrecord.FieldUpdated:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdated(v)
+		return nil
+	case userbuyrecord.FieldDeleted:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleted(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UserBuyRecord numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *UserBuyRecordMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *UserBuyRecordMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *UserBuyRecordMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown UserBuyRecord nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *UserBuyRecordMutation) ResetField(name string) error {
+	switch name {
+	case userbuyrecord.FieldPower:
+		m.ResetPower()
+		return nil
+	case userbuyrecord.FieldPowerNum:
+		m.ResetPowerNum()
+		return nil
+	case userbuyrecord.FieldTotalPower:
+		m.ResetTotalPower()
+		return nil
+	case userbuyrecord.FieldTotalDay:
+		m.ResetTotalDay()
+		return nil
+	case userbuyrecord.FieldRemainDay:
+		m.ResetRemainDay()
+		return nil
+	case userbuyrecord.FieldNode:
+		m.ResetNode()
+		return nil
+	case userbuyrecord.FieldUsedUsdt:
+		m.ResetUsedUsdt()
+		return nil
+	case userbuyrecord.FieldBuyDate:
+		m.ResetBuyDate()
+		return nil
+	case userbuyrecord.FieldCreated:
+		m.ResetCreated()
+		return nil
+	case userbuyrecord.FieldUpdated:
+		m.ResetUpdated()
+		return nil
+	case userbuyrecord.FieldDeleted:
+		m.ResetDeleted()
+		return nil
+	}
+	return fmt.Errorf("unknown UserBuyRecord field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *UserBuyRecordMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.owner != nil {
+		edges = append(edges, userbuyrecord.EdgeOwner)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *UserBuyRecordMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case userbuyrecord.EdgeOwner:
+		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *UserBuyRecordMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *UserBuyRecordMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *UserBuyRecordMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedowner {
+		edges = append(edges, userbuyrecord.EdgeOwner)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *UserBuyRecordMutation) EdgeCleared(name string) bool {
+	switch name {
+	case userbuyrecord.EdgeOwner:
+		return m.clearedowner
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *UserBuyRecordMutation) ClearEdge(name string) error {
+	switch name {
+	case userbuyrecord.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown UserBuyRecord unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *UserBuyRecordMutation) ResetEdge(name string) error {
+	switch name {
+	case userbuyrecord.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown UserBuyRecord edge %s", name)
 }
 
 // UserCountMutation represents an operation that mutates the UserCount nodes in the graph.

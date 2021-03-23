@@ -43,7 +43,12 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
+		// 每一个user只有一个user_count
 		edge.To("count", UserCount.Type).
+			Unique().
 			StorageKey(edge.Column("user_id")), // storageKey指定外键为user_id
+		// 每一个user可以有多条购买记录
+		edge.To("buy_record", UserBuyRecord.Type).
+			StorageKey(edge.Column("user_id")),
 	}
 }

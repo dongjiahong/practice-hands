@@ -5,7 +5,10 @@ package ent
 import (
 	"sqlent/ent/schema"
 	"sqlent/ent/user"
+	"sqlent/ent/userbuyrecord"
 	"sqlent/ent/usercount"
+
+	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -46,6 +49,50 @@ func init() {
 	userDescID := userFields[0].Descriptor()
 	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	user.IDValidator = userDescID.Validators[0].(func(int64) error)
+	userbuyrecordFields := schema.UserBuyRecord{}.Fields()
+	_ = userbuyrecordFields
+	// userbuyrecordDescPower is the schema descriptor for power field.
+	userbuyrecordDescPower := userbuyrecordFields[1].Descriptor()
+	// userbuyrecord.DefaultPower holds the default value on creation for the power field.
+	userbuyrecord.DefaultPower = userbuyrecordDescPower.Default.(int)
+	// userbuyrecordDescPowerNum is the schema descriptor for power_num field.
+	userbuyrecordDescPowerNum := userbuyrecordFields[2].Descriptor()
+	// userbuyrecord.DefaultPowerNum holds the default value on creation for the power_num field.
+	userbuyrecord.DefaultPowerNum = userbuyrecordDescPowerNum.Default.(int)
+	// userbuyrecord.PowerNumValidator is a validator for the "power_num" field. It is called by the builders before save.
+	userbuyrecord.PowerNumValidator = userbuyrecordDescPowerNum.Validators[0].(func(int) error)
+	// userbuyrecordDescTotalDay is the schema descriptor for total_day field.
+	userbuyrecordDescTotalDay := userbuyrecordFields[4].Descriptor()
+	// userbuyrecord.TotalDayValidator is a validator for the "total_day" field. It is called by the builders before save.
+	userbuyrecord.TotalDayValidator = userbuyrecordDescTotalDay.Validators[0].(func(int) error)
+	// userbuyrecordDescRemainDay is the schema descriptor for remain_day field.
+	userbuyrecordDescRemainDay := userbuyrecordFields[5].Descriptor()
+	// userbuyrecord.RemainDayValidator is a validator for the "remain_day" field. It is called by the builders before save.
+	userbuyrecord.RemainDayValidator = userbuyrecordDescRemainDay.Validators[0].(func(int) error)
+	// userbuyrecordDescNode is the schema descriptor for node field.
+	userbuyrecordDescNode := userbuyrecordFields[6].Descriptor()
+	// userbuyrecord.NodeValidator is a validator for the "node" field. It is called by the builders before save.
+	userbuyrecord.NodeValidator = userbuyrecordDescNode.Validators[0].(func(string) error)
+	// userbuyrecordDescBuyDate is the schema descriptor for buy_date field.
+	userbuyrecordDescBuyDate := userbuyrecordFields[8].Descriptor()
+	// userbuyrecord.BuyDateValidator is a validator for the "buy_date" field. It is called by the builders before save.
+	userbuyrecord.BuyDateValidator = userbuyrecordDescBuyDate.Validators[0].(func(string) error)
+	// userbuyrecordDescCreated is the schema descriptor for created field.
+	userbuyrecordDescCreated := userbuyrecordFields[9].Descriptor()
+	// userbuyrecord.DefaultCreated holds the default value on creation for the created field.
+	userbuyrecord.DefaultCreated = userbuyrecordDescCreated.Default.(int64)
+	// userbuyrecordDescUpdated is the schema descriptor for updated field.
+	userbuyrecordDescUpdated := userbuyrecordFields[10].Descriptor()
+	// userbuyrecord.DefaultUpdated holds the default value on creation for the updated field.
+	userbuyrecord.DefaultUpdated = userbuyrecordDescUpdated.Default.(int64)
+	// userbuyrecordDescDeleted is the schema descriptor for deleted field.
+	userbuyrecordDescDeleted := userbuyrecordFields[11].Descriptor()
+	// userbuyrecord.DefaultDeleted holds the default value on creation for the deleted field.
+	userbuyrecord.DefaultDeleted = userbuyrecordDescDeleted.Default.(int64)
+	// userbuyrecordDescID is the schema descriptor for id field.
+	userbuyrecordDescID := userbuyrecordFields[0].Descriptor()
+	// userbuyrecord.DefaultID holds the default value on creation for the id field.
+	userbuyrecord.DefaultID = userbuyrecordDescID.Default.(func() uuid.UUID)
 	usercountFields := schema.UserCount{}.Fields()
 	_ = usercountFields
 	// usercountDescSelfBuy is the schema descriptor for self_buy field.

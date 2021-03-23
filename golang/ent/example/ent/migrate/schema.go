@@ -15,7 +15,7 @@ var (
 		{Name: "password", Type: field.TypeString},
 		{Name: "p_id", Type: field.TypeInt, Default: 0},
 		{Name: "invited_code", Type: field.TypeString},
-		{Name: "created", Type: field.TypeInt64, Default: 1616407968},
+		{Name: "created", Type: field.TypeInt64, Default: 1616483503},
 		{Name: "updated", Type: field.TypeInt64, Default: 0},
 		{Name: "deleted", Type: field.TypeInt64, Default: 0},
 	}
@@ -26,16 +26,46 @@ var (
 		PrimaryKey:  []*schema.Column{UsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// UserBuyRecordsColumns holds the columns for the "user_buy_records" table.
+	UserBuyRecordsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "power", Type: field.TypeInt, Default: 0},
+		{Name: "power_num", Type: field.TypeInt, Default: 0},
+		{Name: "total_power", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(18.8)"}},
+		{Name: "total_day", Type: field.TypeInt},
+		{Name: "remain_day", Type: field.TypeInt},
+		{Name: "node", Type: field.TypeString},
+		{Name: "used_usdt", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(18.8)"}},
+		{Name: "buy_date", Type: field.TypeString},
+		{Name: "created", Type: field.TypeInt64, Default: 1616483503},
+		{Name: "updated", Type: field.TypeInt64, Default: 0},
+		{Name: "deleted", Type: field.TypeInt64, Default: 0},
+		{Name: "user_id", Type: field.TypeInt64, Nullable: true},
+	}
+	// UserBuyRecordsTable holds the schema information for the "user_buy_records" table.
+	UserBuyRecordsTable = &schema.Table{
+		Name:       "user_buy_records",
+		Columns:    UserBuyRecordsColumns,
+		PrimaryKey: []*schema.Column{UserBuyRecordsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_buy_records_users_buy_record",
+				Columns:    []*schema.Column{UserBuyRecordsColumns[12]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UserCountsColumns holds the columns for the "user_counts" table.
 	UserCountsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "self_buy", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(18,8)"}},
 		{Name: "invite_buy", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(18,8)"}},
 		{Name: "level", Type: field.TypeInt, Default: 0},
-		{Name: "created", Type: field.TypeInt64, Default: 1616407968},
+		{Name: "created", Type: field.TypeInt64, Default: 1616483503},
 		{Name: "updated", Type: field.TypeInt64, Default: 0},
 		{Name: "deleted", Type: field.TypeInt64, Default: 0},
-		{Name: "user_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt64, Unique: true, Nullable: true},
 	}
 	// UserCountsTable holds the schema information for the "user_counts" table.
 	UserCountsTable = &schema.Table{
@@ -54,10 +84,12 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		UsersTable,
+		UserBuyRecordsTable,
 		UserCountsTable,
 	}
 )
 
 func init() {
+	UserBuyRecordsTable.ForeignKeys[0].RefTable = UsersTable
 	UserCountsTable.ForeignKeys[0].RefTable = UsersTable
 }

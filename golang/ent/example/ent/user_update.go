@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"sqlent/ent/predicate"
 	"sqlent/ent/user"
+	"sqlent/ent/userbuyrecord"
 	"sqlent/ent/usercount"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -108,19 +110,38 @@ func (uu *UserUpdate) AddDeleted(i int64) *UserUpdate {
 	return uu
 }
 
-// AddCountIDs adds the "count" edge to the UserCount entity by IDs.
-func (uu *UserUpdate) AddCountIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddCountIDs(ids...)
+// SetCountID sets the "count" edge to the UserCount entity by ID.
+func (uu *UserUpdate) SetCountID(id int) *UserUpdate {
+	uu.mutation.SetCountID(id)
 	return uu
 }
 
-// AddCount adds the "count" edges to the UserCount entity.
-func (uu *UserUpdate) AddCount(u ...*UserCount) *UserUpdate {
-	ids := make([]int, len(u))
+// SetNillableCountID sets the "count" edge to the UserCount entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableCountID(id *int) *UserUpdate {
+	if id != nil {
+		uu = uu.SetCountID(*id)
+	}
+	return uu
+}
+
+// SetCount sets the "count" edge to the UserCount entity.
+func (uu *UserUpdate) SetCount(u *UserCount) *UserUpdate {
+	return uu.SetCountID(u.ID)
+}
+
+// AddBuyRecordIDs adds the "buy_record" edge to the UserBuyRecord entity by IDs.
+func (uu *UserUpdate) AddBuyRecordIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddBuyRecordIDs(ids...)
+	return uu
+}
+
+// AddBuyRecord adds the "buy_record" edges to the UserBuyRecord entity.
+func (uu *UserUpdate) AddBuyRecord(u ...*UserBuyRecord) *UserUpdate {
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return uu.AddCountIDs(ids...)
+	return uu.AddBuyRecordIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -128,25 +149,31 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearCount clears all "count" edges to the UserCount entity.
+// ClearCount clears the "count" edge to the UserCount entity.
 func (uu *UserUpdate) ClearCount() *UserUpdate {
 	uu.mutation.ClearCount()
 	return uu
 }
 
-// RemoveCountIDs removes the "count" edge to UserCount entities by IDs.
-func (uu *UserUpdate) RemoveCountIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveCountIDs(ids...)
+// ClearBuyRecord clears all "buy_record" edges to the UserBuyRecord entity.
+func (uu *UserUpdate) ClearBuyRecord() *UserUpdate {
+	uu.mutation.ClearBuyRecord()
 	return uu
 }
 
-// RemoveCount removes "count" edges to UserCount entities.
-func (uu *UserUpdate) RemoveCount(u ...*UserCount) *UserUpdate {
-	ids := make([]int, len(u))
+// RemoveBuyRecordIDs removes the "buy_record" edge to UserBuyRecord entities by IDs.
+func (uu *UserUpdate) RemoveBuyRecordIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveBuyRecordIDs(ids...)
+	return uu
+}
+
+// RemoveBuyRecord removes "buy_record" edges to UserBuyRecord entities.
+func (uu *UserUpdate) RemoveBuyRecord(u ...*UserBuyRecord) *UserUpdate {
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return uu.RemoveCountIDs(ids...)
+	return uu.RemoveBuyRecordIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -309,7 +336,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.CountCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   user.CountTable,
 			Columns: []string{user.CountColumn},
@@ -323,9 +350,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedCountIDs(); len(nodes) > 0 && !uu.mutation.CountCleared() {
+	if nodes := uu.mutation.CountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   user.CountTable,
 			Columns: []string{user.CountColumn},
@@ -340,19 +367,54 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := uu.mutation.CountIDs(); len(nodes) > 0 {
+	if uu.mutation.BuyRecordCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.CountTable,
-			Columns: []string{user.CountColumn},
+			Table:   user.BuyRecordTable,
+			Columns: []string{user.BuyRecordColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: usercount.FieldID,
+					Type:   field.TypeUUID,
+					Column: userbuyrecord.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedBuyRecordIDs(); len(nodes) > 0 && !uu.mutation.BuyRecordCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BuyRecordTable,
+			Columns: []string{user.BuyRecordColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: userbuyrecord.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.BuyRecordIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BuyRecordTable,
+			Columns: []string{user.BuyRecordColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: userbuyrecord.FieldID,
 				},
 			},
 		}
@@ -460,19 +522,38 @@ func (uuo *UserUpdateOne) AddDeleted(i int64) *UserUpdateOne {
 	return uuo
 }
 
-// AddCountIDs adds the "count" edge to the UserCount entity by IDs.
-func (uuo *UserUpdateOne) AddCountIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddCountIDs(ids...)
+// SetCountID sets the "count" edge to the UserCount entity by ID.
+func (uuo *UserUpdateOne) SetCountID(id int) *UserUpdateOne {
+	uuo.mutation.SetCountID(id)
 	return uuo
 }
 
-// AddCount adds the "count" edges to the UserCount entity.
-func (uuo *UserUpdateOne) AddCount(u ...*UserCount) *UserUpdateOne {
-	ids := make([]int, len(u))
+// SetNillableCountID sets the "count" edge to the UserCount entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableCountID(id *int) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetCountID(*id)
+	}
+	return uuo
+}
+
+// SetCount sets the "count" edge to the UserCount entity.
+func (uuo *UserUpdateOne) SetCount(u *UserCount) *UserUpdateOne {
+	return uuo.SetCountID(u.ID)
+}
+
+// AddBuyRecordIDs adds the "buy_record" edge to the UserBuyRecord entity by IDs.
+func (uuo *UserUpdateOne) AddBuyRecordIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddBuyRecordIDs(ids...)
+	return uuo
+}
+
+// AddBuyRecord adds the "buy_record" edges to the UserBuyRecord entity.
+func (uuo *UserUpdateOne) AddBuyRecord(u ...*UserBuyRecord) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return uuo.AddCountIDs(ids...)
+	return uuo.AddBuyRecordIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -480,25 +561,31 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearCount clears all "count" edges to the UserCount entity.
+// ClearCount clears the "count" edge to the UserCount entity.
 func (uuo *UserUpdateOne) ClearCount() *UserUpdateOne {
 	uuo.mutation.ClearCount()
 	return uuo
 }
 
-// RemoveCountIDs removes the "count" edge to UserCount entities by IDs.
-func (uuo *UserUpdateOne) RemoveCountIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveCountIDs(ids...)
+// ClearBuyRecord clears all "buy_record" edges to the UserBuyRecord entity.
+func (uuo *UserUpdateOne) ClearBuyRecord() *UserUpdateOne {
+	uuo.mutation.ClearBuyRecord()
 	return uuo
 }
 
-// RemoveCount removes "count" edges to UserCount entities.
-func (uuo *UserUpdateOne) RemoveCount(u ...*UserCount) *UserUpdateOne {
-	ids := make([]int, len(u))
+// RemoveBuyRecordIDs removes the "buy_record" edge to UserBuyRecord entities by IDs.
+func (uuo *UserUpdateOne) RemoveBuyRecordIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveBuyRecordIDs(ids...)
+	return uuo
+}
+
+// RemoveBuyRecord removes "buy_record" edges to UserBuyRecord entities.
+func (uuo *UserUpdateOne) RemoveBuyRecord(u ...*UserBuyRecord) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return uuo.RemoveCountIDs(ids...)
+	return uuo.RemoveBuyRecordIDs(ids...)
 }
 
 // Save executes the query and returns the updated User entity.
@@ -666,7 +753,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.CountCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   user.CountTable,
 			Columns: []string{user.CountColumn},
@@ -680,9 +767,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedCountIDs(); len(nodes) > 0 && !uuo.mutation.CountCleared() {
+	if nodes := uuo.mutation.CountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   user.CountTable,
 			Columns: []string{user.CountColumn},
@@ -697,19 +784,54 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := uuo.mutation.CountIDs(); len(nodes) > 0 {
+	if uuo.mutation.BuyRecordCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.CountTable,
-			Columns: []string{user.CountColumn},
+			Table:   user.BuyRecordTable,
+			Columns: []string{user.BuyRecordColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: usercount.FieldID,
+					Type:   field.TypeUUID,
+					Column: userbuyrecord.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedBuyRecordIDs(); len(nodes) > 0 && !uuo.mutation.BuyRecordCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BuyRecordTable,
+			Columns: []string{user.BuyRecordColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: userbuyrecord.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.BuyRecordIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BuyRecordTable,
+			Columns: []string{user.BuyRecordColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: userbuyrecord.FieldID,
 				},
 			},
 		}

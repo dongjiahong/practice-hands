@@ -10,11 +10,13 @@ import (
 	"sqlent/ent/migrate"
 
 	"sqlent/ent/user"
+	"sqlent/ent/userbuyrecord"
 	"sqlent/ent/usercount"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 )
 
 // Client is the client that holds all ent builders.
@@ -24,6 +26,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserBuyRecord is the client for interacting with the UserBuyRecord builders.
+	UserBuyRecord *UserBuyRecordClient
 	// UserCount is the client for interacting with the UserCount builders.
 	UserCount *UserCountClient
 }
@@ -40,6 +44,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.User = NewUserClient(c.config)
+	c.UserBuyRecord = NewUserBuyRecordClient(c.config)
 	c.UserCount = NewUserCountClient(c.config)
 }
 
@@ -72,10 +77,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		User:      NewUserClient(cfg),
-		UserCount: NewUserCountClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		User:          NewUserClient(cfg),
+		UserBuyRecord: NewUserBuyRecordClient(cfg),
+		UserCount:     NewUserCountClient(cfg),
 	}, nil
 }
 
@@ -93,9 +99,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:    cfg,
-		User:      NewUserClient(cfg),
-		UserCount: NewUserCountClient(cfg),
+		config:        cfg,
+		User:          NewUserClient(cfg),
+		UserBuyRecord: NewUserBuyRecordClient(cfg),
+		UserCount:     NewUserCountClient(cfg),
 	}, nil
 }
 
@@ -126,6 +133,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.User.Use(hooks...)
+	c.UserBuyRecord.Use(hooks...)
 	c.UserCount.Use(hooks...)
 }
 
@@ -220,7 +228,23 @@ func (c *UserClient) QueryCount(u *User) *UserCountQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(usercount.Table, usercount.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.CountTable, user.CountColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.CountTable, user.CountColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBuyRecord queries the buy_record edge of a User.
+func (c *UserClient) QueryBuyRecord(u *User) *UserBuyRecordQuery {
+	query := &UserBuyRecordQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(userbuyrecord.Table, userbuyrecord.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.BuyRecordTable, user.BuyRecordColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -231,6 +255,110 @@ func (c *UserClient) QueryCount(u *User) *UserCountQuery {
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
+}
+
+// UserBuyRecordClient is a client for the UserBuyRecord schema.
+type UserBuyRecordClient struct {
+	config
+}
+
+// NewUserBuyRecordClient returns a client for the UserBuyRecord from the given config.
+func NewUserBuyRecordClient(c config) *UserBuyRecordClient {
+	return &UserBuyRecordClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userbuyrecord.Hooks(f(g(h())))`.
+func (c *UserBuyRecordClient) Use(hooks ...Hook) {
+	c.hooks.UserBuyRecord = append(c.hooks.UserBuyRecord, hooks...)
+}
+
+// Create returns a create builder for UserBuyRecord.
+func (c *UserBuyRecordClient) Create() *UserBuyRecordCreate {
+	mutation := newUserBuyRecordMutation(c.config, OpCreate)
+	return &UserBuyRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserBuyRecord entities.
+func (c *UserBuyRecordClient) CreateBulk(builders ...*UserBuyRecordCreate) *UserBuyRecordCreateBulk {
+	return &UserBuyRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserBuyRecord.
+func (c *UserBuyRecordClient) Update() *UserBuyRecordUpdate {
+	mutation := newUserBuyRecordMutation(c.config, OpUpdate)
+	return &UserBuyRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserBuyRecordClient) UpdateOne(ubr *UserBuyRecord) *UserBuyRecordUpdateOne {
+	mutation := newUserBuyRecordMutation(c.config, OpUpdateOne, withUserBuyRecord(ubr))
+	return &UserBuyRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserBuyRecordClient) UpdateOneID(id uuid.UUID) *UserBuyRecordUpdateOne {
+	mutation := newUserBuyRecordMutation(c.config, OpUpdateOne, withUserBuyRecordID(id))
+	return &UserBuyRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserBuyRecord.
+func (c *UserBuyRecordClient) Delete() *UserBuyRecordDelete {
+	mutation := newUserBuyRecordMutation(c.config, OpDelete)
+	return &UserBuyRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *UserBuyRecordClient) DeleteOne(ubr *UserBuyRecord) *UserBuyRecordDeleteOne {
+	return c.DeleteOneID(ubr.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *UserBuyRecordClient) DeleteOneID(id uuid.UUID) *UserBuyRecordDeleteOne {
+	builder := c.Delete().Where(userbuyrecord.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserBuyRecordDeleteOne{builder}
+}
+
+// Query returns a query builder for UserBuyRecord.
+func (c *UserBuyRecordClient) Query() *UserBuyRecordQuery {
+	return &UserBuyRecordQuery{config: c.config}
+}
+
+// Get returns a UserBuyRecord entity by its id.
+func (c *UserBuyRecordClient) Get(ctx context.Context, id uuid.UUID) (*UserBuyRecord, error) {
+	return c.Query().Where(userbuyrecord.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserBuyRecordClient) GetX(ctx context.Context, id uuid.UUID) *UserBuyRecord {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOwner queries the owner edge of a UserBuyRecord.
+func (c *UserBuyRecordClient) QueryOwner(ubr *UserBuyRecord) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ubr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(userbuyrecord.Table, userbuyrecord.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, userbuyrecord.OwnerTable, userbuyrecord.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(ubr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserBuyRecordClient) Hooks() []Hook {
+	return c.hooks.UserBuyRecord
 }
 
 // UserCountClient is a client for the UserCount schema.
@@ -324,7 +452,7 @@ func (c *UserCountClient) QueryOwner(uc *UserCount) *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(usercount.Table, usercount.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, usercount.OwnerTable, usercount.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, usercount.OwnerTable, usercount.OwnerColumn),
 		)
 		fromV = sqlgraph.Neighbors(uc.driver.Dialect(), step)
 		return fromV, nil

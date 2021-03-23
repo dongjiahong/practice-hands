@@ -14,9 +14,10 @@ func NewUserCountDao(conn *ent.Client) *UserCountDao {
 	return &UserCountDao{conn: conn}
 }
 
-func (d *UserCountDao) CreateUserCount(ctx context.Context, u *ent.UserCount) (*ent.UserCount, error) {
+func (d *UserCountDao) CreateUserCount(ctx context.Context, own *ent.User, u *ent.UserCount) (*ent.UserCount, error) {
 	return d.conn.UserCount.
 		Create().
+		SetOwnerID(own.ID).
 		SetSelfBuy(u.SelfBuy).
 		SetInviteBuy(u.InviteBuy).
 		SetLevel(u.Level).

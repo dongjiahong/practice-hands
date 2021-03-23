@@ -784,7 +784,7 @@ func HasCount() predicate.User {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CountTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, CountTable, CountColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, CountTable, CountColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -796,7 +796,35 @@ func HasCountWith(preds ...predicate.UserCount) predicate.User {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CountInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, CountTable, CountColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, CountTable, CountColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasBuyRecord applies the HasEdge predicate on the "buy_record" edge.
+func HasBuyRecord() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BuyRecordTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BuyRecordTable, BuyRecordColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBuyRecordWith applies the HasEdge predicate on the "buy_record" edge with a given conditions (other predicates).
+func HasBuyRecordWith(preds ...predicate.UserBuyRecord) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BuyRecordInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BuyRecordTable, BuyRecordColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

@@ -7,10 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"sqlent/ent/user"
+	"sqlent/ent/userbuyrecord"
 	"sqlent/ent/usercount"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -100,19 +102,38 @@ func (uc *UserCreate) SetID(i int64) *UserCreate {
 	return uc
 }
 
-// AddCountIDs adds the "count" edge to the UserCount entity by IDs.
-func (uc *UserCreate) AddCountIDs(ids ...int) *UserCreate {
-	uc.mutation.AddCountIDs(ids...)
+// SetCountID sets the "count" edge to the UserCount entity by ID.
+func (uc *UserCreate) SetCountID(id int) *UserCreate {
+	uc.mutation.SetCountID(id)
 	return uc
 }
 
-// AddCount adds the "count" edges to the UserCount entity.
-func (uc *UserCreate) AddCount(u ...*UserCount) *UserCreate {
-	ids := make([]int, len(u))
+// SetNillableCountID sets the "count" edge to the UserCount entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableCountID(id *int) *UserCreate {
+	if id != nil {
+		uc = uc.SetCountID(*id)
+	}
+	return uc
+}
+
+// SetCount sets the "count" edge to the UserCount entity.
+func (uc *UserCreate) SetCount(u *UserCount) *UserCreate {
+	return uc.SetCountID(u.ID)
+}
+
+// AddBuyRecordIDs adds the "buy_record" edge to the UserBuyRecord entity by IDs.
+func (uc *UserCreate) AddBuyRecordIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddBuyRecordIDs(ids...)
+	return uc
+}
+
+// AddBuyRecord adds the "buy_record" edges to the UserBuyRecord entity.
+func (uc *UserCreate) AddBuyRecord(u ...*UserBuyRecord) *UserCreate {
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return uc.AddCountIDs(ids...)
+	return uc.AddBuyRecordIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -319,7 +340,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	}
 	if nodes := uc.mutation.CountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   user.CountTable,
 			Columns: []string{user.CountColumn},
@@ -328,6 +349,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: usercount.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.BuyRecordIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BuyRecordTable,
+			Columns: []string{user.BuyRecordColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: userbuyrecord.FieldID,
 				},
 			},
 		}

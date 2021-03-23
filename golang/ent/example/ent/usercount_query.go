@@ -70,7 +70,7 @@ func (ucq *UserCountQuery) QueryOwner() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(usercount.Table, usercount.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, usercount.OwnerTable, usercount.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, usercount.OwnerTable, usercount.OwnerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ucq.driver.Dialect(), step)
 		return fromU, nil

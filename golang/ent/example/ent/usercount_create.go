@@ -298,7 +298,7 @@ func (ucc *UserCountCreate) createSpec() (*UserCount, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ucc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   usercount.OwnerTable,
 			Columns: []string{usercount.OwnerColumn},

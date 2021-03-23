@@ -303,7 +303,7 @@ func (ucu *UserCountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ucu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   usercount.OwnerTable,
 			Columns: []string{usercount.OwnerColumn},
@@ -319,7 +319,7 @@ func (ucu *UserCountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := ucu.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   usercount.OwnerTable,
 			Columns: []string{usercount.OwnerColumn},
@@ -635,7 +635,7 @@ func (ucuo *UserCountUpdateOne) sqlSave(ctx context.Context) (_node *UserCount, 
 	}
 	if ucuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   usercount.OwnerTable,
 			Columns: []string{usercount.OwnerColumn},
@@ -651,7 +651,7 @@ func (ucuo *UserCountUpdateOne) sqlSave(ctx context.Context) (_node *UserCount, 
 	}
 	if nodes := ucuo.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   usercount.OwnerTable,
 			Columns: []string{usercount.OwnerColumn},
