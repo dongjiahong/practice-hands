@@ -15,6 +15,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(middleware.Cors())
+	r.Use(middleware.)
 
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) // api注释
 	apiv1 := r.Group("api/v1")

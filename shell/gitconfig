@@ -6,6 +6,7 @@
     co = checkout
     ci = commit
     br = branch
+    sw = switch
 [core]
     editor = vim
 [http]
