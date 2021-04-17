@@ -82,9 +82,13 @@ let g:rainbow_active = 1
 "let g:go_fmt_autosave=0
 let g:go_fmt_command="gofmt"
 let g:go_imports_autosave=0 " 保存时不自动导入包--太慢了
+let g:go_highlight_types = 1
 let g:go_template_autocreate = 1 " 新文件不自动填充
 let g:go_highlight_fields = 1 " 变量高亮
 let g:go_highlight_functions = 1 " 函数高亮
+let g:go_highlight_function_calls = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_extra_types = 1
 " 导入包
 nmap <F10> :GoImports <CR> 
 " 查看谁引用了
