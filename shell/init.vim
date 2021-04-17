@@ -78,5 +78,14 @@ let g:rustfmt_autosave = 1
 "------->>>rainbow 彩虹括号<<<-----
 let g:rainbow_active = 1
 
-"------->>>go-vim<<<<------
-nmap <F10> :GoImports <CR>
+" ---------> vim-go <-------------
+"let g:go_fmt_autosave=0
+let g:go_fmt_command="gofmt"
+let g:go_imports_autosave=0 " 保存时不自动导入包--太慢了
+let g:go_template_autocreate = 1 " 新文件不自动填充
+let g:go_highlight_fields = 1 " 变量高亮
+let g:go_highlight_functions = 1 " 函数高亮
+" 导入包
+nmap <F10> :GoImports <CR> 
+" 查看谁引用了
+nmap <F9> :GoReferrers  <CR> 
