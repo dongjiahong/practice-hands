@@ -82,14 +82,29 @@ let g:rainbow_active = 1
 "let g:go_fmt_autosave=0
 let g:go_fmt_command="gofmt"
 let g:go_imports_autosave=0 " 保存时不自动导入包--太慢了
+let g:go_template_autocreate = 0 " 新文件不自动填充
 let g:go_highlight_types = 1
-let g:go_template_autocreate = 1 " 新文件不自动填充
 let g:go_highlight_fields = 1 " 变量高亮
 let g:go_highlight_functions = 1 " 函数高亮
 let g:go_highlight_function_calls = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_extra_types = 1
-" 导入包
-nmap <F10> :GoImports <CR> 
-" 查看谁引用了
-nmap <F9> :GoReferrers  <CR> 
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_generate_tags = 1
+" dsable all linters as that is taken care of by coc.nvim
+let g:go_diagnostics_enabled = 0
+let g:go_metalinter_enabled = []
+" don't jump to errors after metalinter is invoked
+let g:go_jump_to_error = 0
+" automatically highlight variable your cursor is on
+let g:go_auto_sameids = 0
+"Show the function signature for a given routine with ,+i:
+autocmd BufEnter *.go nmap <leader>i  <Plug>(go-info)
+"Show the interfaces a type implements with ,+ii:
+autocmd BufEnter *.go nmap <leader>ii  <Plug>(go-implements)
+"See the callers of a given function with ,+cc:
+autocmd BufEnter *.go nmap <leader>cc  <Plug>(go-callers)
+"Find all references of a given type/function in the codebase with ,+cr:
+nmap <leader>cr <Plug>(coc-references)
+"Not many options here, but there’s renaming the symbol your cursor is on with ,+r:
+nmap <leader>r <Plug>(coc-rename)
