@@ -91,19 +91,15 @@ let g:go_highlight_operators = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_build_constraints = 1
 let g:go_highlight_generate_tags = 1
+let g:go_code_completion_enabled = 0 " 使用了coc-go提示，这里不用vim-go提示
 " dsable all linters as that is taken care of by coc.nvim
-let g:go_diagnostics_enabled = 0
+let g:go_diagnostics_enabled = 0 " 使用coc-go的检查，这里不用vim-go的
 let g:go_metalinter_enabled = []
 " don't jump to errors after metalinter is invoked
 let g:go_jump_to_error = 0
 " automatically highlight variable your cursor is on
-let g:go_auto_sameids = 0
+let g:go_auto_sameids = 1
 "Show the function signature for a given routine with ,+i:
-autocmd BufEnter *.go nmap <leader>i  <Plug>(go-info)
-"Show the interfaces a type implements with ,+ii:
-autocmd BufEnter *.go nmap <leader>ii  <Plug>(go-implements)
-"See the callers of a given function with ,+cc:
-autocmd BufEnter *.go nmap <leader>cc  <Plug>(go-callers)
 "Find all references of a given type/function in the codebase with ,+cr:
 nmap <leader>cr <Plug>(coc-references)
 "Not many options here, but there’s renaming the symbol your cursor is on with ,+r:
