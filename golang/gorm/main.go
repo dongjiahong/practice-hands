@@ -52,8 +52,9 @@ func UpdateStudent(s *Student) {
 }
 
 func GetStudentId() {
-	var ids []Id
-	err := db.Model(&Student{}).Scan(&ids).Error
+	//var ids []Id
+	var ids []int
+	err := db.Model(&Student{}).Select("id").Scan(ids).Error
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -109,15 +110,15 @@ func main() {
 	initDB()
 	//test_raw()
 
-	s := &Student{
-		Id:   3,
-		Name: "haha",
-		//Age:  0,
-	}
+	//s := &Student{
+	//Id:   3,
+	//Name: "haha",
+	////Age:  0,
+	//}
 	//fmt.Println(AddStudent(s))
-	fmt.Println("=========================")
-	UpdateStudent(s)
+	//fmt.Println("=========================")
+	//UpdateStudent(s)
 	GetStudentId()
-	GetStudentById([]int{1, 2, 3})
-	GetStudentById([]int{})
+	//GetStudentById([]int{1, 2, 3})
+	//GetStudentById([]int{})
 }

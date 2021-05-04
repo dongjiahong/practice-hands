@@ -28,7 +28,13 @@ set nobackup		"不允许自动备份
 
 set laststatus=2	"显示状态栏
 set statusline=[%F]%y%r%m%*%=[Line:%l/%L,Column:%c][%p%%]
-"下面是对molokai的主题配置,需要将molokai.vim文件拷贝到/usr/share/vim/vim74/colors
+"XXX 对于主题
+""Neovim:
+""cd phanviet/colors
+""mv monokai_pro.vim ~/.config/nvim/colors
+""Vim:
+""cd phanviet/colors
+""mv monokai_pro.vim ~/.vim/colors
 set t_Co=256
 colorscheme molokai
 let g:rehash256 = 1 
@@ -48,6 +54,9 @@ call plug#begin('~/.vim/plugged')
 Plug 'scrooloose/nerdtree'
 " molokai colors
 Plug 'tomasr/molokai'
+Plug 'J4CKR3D/Hypsteria'
+Plug 'Jimeno0/vim-chito'
+Plug 'phanviet/vim-monokai-pro'
 " golang
 Plug 'fatih/vim-go'
 " commenter 注释
@@ -80,9 +89,9 @@ let g:rainbow_active = 1
 
 " ---------> vim-go <-------------
 "let g:go_fmt_autosave=0
-let g:go_fmt_command="gofmt"
+"let g:go_fmt_command="gofmt"
 let g:go_imports_autosave=0 " 保存时不自动导入包--太慢了
-let g:go_template_autocreate = 0 " 新文件不自动填充
+"let g:go_template_autocreate = 0 " 新文件不自动填充
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1 " 变量高亮
 let g:go_highlight_functions = 1 " 函数高亮
@@ -91,16 +100,23 @@ let g:go_highlight_operators = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_build_constraints = 1
 let g:go_highlight_generate_tags = 1
-let g:go_code_completion_enabled = 0 " 使用了coc-go提示，这里不用vim-go提示
+let g:go_code_completion_enabled = 0
 " dsable all linters as that is taken care of by coc.nvim
-let g:go_diagnostics_enabled = 0 " 使用coc-go的检查，这里不用vim-go的
+let g:go_diagnostics_enabled = 0
 let g:go_metalinter_enabled = []
 " don't jump to errors after metalinter is invoked
-let g:go_jump_to_error = 0
+"let g:go_jump_to_error = 0
 " automatically highlight variable your cursor is on
-let g:go_auto_sameids = 1
+"let g:go_auto_sameids = 0
 "Show the function signature for a given routine with ,+i:
+"autocmd BufEnter *.go nmap <leader>i  <Plug>(go-info)
+"Show the interfaces a type implements with ,+ii:
+"autocmd BufEnter *.go nmap <leader>ii  <Plug>(go-implements)
+"See the callers of a given function with ,+cc:
+"autocmd BufEnter *.go nmap <leader>cc  <Plug>(go-callers)
 "Find all references of a given type/function in the codebase with ,+cr:
 nmap <leader>cr <Plug>(coc-references)
 "Not many options here, but there’s renaming the symbol your cursor is on with ,+r:
 nmap <leader>r <Plug>(coc-rename)
+" 不让coc-go提示
+"autocmd FileType go let b:coc_suggest_disable = 1
