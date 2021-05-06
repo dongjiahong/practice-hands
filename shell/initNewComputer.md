@@ -22,6 +22,12 @@ mkdir -p ~/.config/nvim
 cp ./init.vim ~/.config/nvim/init.vim
 ```
 
+# 安装gotags
+```sh
+go get -u github.com/jstemmer/gotags
+sudo apt install ctags
+```
+
 # golang 安装二进制工具
 ```sh
 nvim -c 'GoInstallBinaries|q'

@@ -59,6 +59,9 @@ Plug 'Jimeno0/vim-chito'
 Plug 'phanviet/vim-monokai-pro'
 " golang
 Plug 'fatih/vim-go'
+" gotags
+Plug 'jstemmer/gotags'
+Plug 'preservim/tagbar'
 " commenter 注释
 Plug 'scrooloose/nerdcommenter'
 " coc
@@ -104,19 +107,39 @@ let g:go_code_completion_enabled = 0
 " dsable all linters as that is taken care of by coc.nvim
 let g:go_diagnostics_enabled = 0
 let g:go_metalinter_enabled = []
-" don't jump to errors after metalinter is invoked
-"let g:go_jump_to_error = 0
-" automatically highlight variable your cursor is on
-"let g:go_auto_sameids = 0
-"Show the function signature for a given routine with ,+i:
-"autocmd BufEnter *.go nmap <leader>i  <Plug>(go-info)
-"Show the interfaces a type implements with ,+ii:
-"autocmd BufEnter *.go nmap <leader>ii  <Plug>(go-implements)
-"See the callers of a given function with ,+cc:
-"autocmd BufEnter *.go nmap <leader>cc  <Plug>(go-callers)
 "Find all references of a given type/function in the codebase with ,+cr:
 nmap <leader>cr <Plug>(coc-references)
 "Not many options here, but there’s renaming the symbol your cursor is on with ,+r:
 nmap <leader>r <Plug>(coc-rename)
 " 不让coc-go提示
 "autocmd FileType go let b:coc_suggest_disable = 1
+
+" -------------> gotags <------------
+map <F8> :Tagbar<CR>
+let g:tagbar_type_go = {
+    \ 'ctagstype' : 'go',
+    \ 'kinds'     : [
+        \ 'p:package',
+        \ 'i:imports:1',
+        \ 'c:constants',
+        \ 'v:variables',
+        \ 't:types',
+        \ 'n:interfaces',
+        \ 'w:fields',
+        \ 'e:embedded',
+        \ 'm:methods',
+        \ 'r:constructor',
+        \ 'f:functions'
+    \ ],
+    \ 'sro' : '.',
+    \ 'kind2scope' : {
+        \ 't' : 'ctype',
+        \ 'n' : 'ntype'
+    \ },
+    \ 'scope2kind' : {
+        \ 'ctype' : 't',
+        \ 'ntype' : 'n'
+    \ },
+    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsargs' : '-sort -silent'
+\ }
