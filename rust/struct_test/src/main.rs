@@ -23,6 +23,7 @@ fn main() {
         width: 24,
         height: 22,
     };
+    println!("rect3: {:#?}", rect3);
     println!(
         "The area of the rectangle is {} square pixels.",
         rect1.area()
