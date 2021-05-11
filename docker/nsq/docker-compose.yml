@@ -10,7 +10,7 @@ services:
     # 守护进程，负责接收、排队、投递消息给客户端
     nsqd:
         image: nsqio/nsq
-        command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
+        command: /nsqd -lookupd-tcp-address=nsqlookupd:4160 -mem-queue-size=0 # mem-queue-size=0表示存在磁盘中
         depends_on:
             - nsqlookupd
         ports:
@@ -19,7 +19,7 @@ services:
     # nsqadmin webui
     nsqadmin:
         image: nsqio/nsq
-        command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+        command: /nsqadmin -lookupd-http-address=nsqlookupd:4161
         depends_on:
             - nsqlookupd
         ports:
