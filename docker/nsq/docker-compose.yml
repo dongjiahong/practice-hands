@@ -1,0 +1,26 @@
+version: '3'
+services:
+    # nsqlookupd 是守护进程负责管理拓扑信息
+    nsqlookupd:
+        image: nsqio/nsq
+        command: /nsqlookupd
+        ports:
+            - "4160"
+            - "4161:4061"
+    # 守护进程，负责接收、排队、投递消息给客户端
+    nsqd:
+        image: nsqio/nsq
+        command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
+        depends_on:
+            - nsqlookupd
+        ports:
+            - "4150:4150"
+            - "4151"
+    # nsqadmin webui
+    nsqadmin:
+        image: nsqio/nsq
+        command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+        depends_on:
+            - nsqlookupd
+        ports:
+            - "4171:4171" # 后面的4171是对外映射
