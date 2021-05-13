@@ -5,4 +5,4 @@ docker-compose up -d
 ##查看组件日志
 #docker-compose logs 
 #停止组件
-docker-compose down
+#docker-compose down

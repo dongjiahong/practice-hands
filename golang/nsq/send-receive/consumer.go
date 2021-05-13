@@ -22,7 +22,25 @@ type CustomerMessage struct {
 	Body  string `json:"body"`
 }
 
-func doConsumerTask() {
+func deal(msg *nsq.Message) error {
+	var cm CustomerMessage
+	if err := json.Unmarshal(msg.Body, &cm); err != nil {
+		msg.Requeue(time.Second * 2)
+		return errors.New("unmarshal err: " + err.Error())
+	}
+	if cm.MesID%5 == 0 {
+		if rand.Intn(2) == 1 {
+			msg.Finish()
+			return nil
+		}
+		msg.Requeue(time.Second * 2)
+		return errors.New("random err")
+	}
+	//msg.Finish()
+	return nil
+}
+
+func doConsumerTask(do nsq.HandlerFunc) {
 	// 1. 创建消费者
 	config := nsq.NewConfig()
 	consumer, errNewCsmr := nsq.NewConsumer(topic, topicChannel, config)
@@ -33,22 +51,28 @@ func doConsumerTask() {
 	// 2. 添加处理消息方法
 	consumer.AddHandler(nsq.HandlerFunc(func(msg *nsq.Message) error {
 		log.Printf("message: %v", string(msg.Body))
-		var cm CustomerMessage
-		if err := json.Unmarshal(msg.Body, &cm); err != nil {
-			msg.Requeue(time.Second * 2)
-			return errors.New("unmarshal err: " + err.Error())
-		}
-		if cm.MesID%5 == 0 {
-			if rand.Intn(2) == 1 {
-				msg.Finish()
-				return nil
-			}
-			msg.Requeue(time.Second * 2)
-			return errors.New("random err")
-		}
-		//msg.Finish()
-		return nil
+		return do(msg)
 	}))
+
+	// 2. 添加处理消息方法
+	//consumer.AddHandler(nsq.HandlerFunc(func(msg *nsq.Message) error {
+	//log.Printf("message: %v", string(msg.Body))
+	//var cm CustomerMessage
+	//if err := json.Unmarshal(msg.Body, &cm); err != nil {
+	//msg.Requeue(time.Second * 2)
+	//return errors.New("unmarshal err: " + err.Error())
+	//}
+	//if cm.MesID%5 == 0 {
+	//if rand.Intn(2) == 1 {
+	//msg.Finish()
+	//return nil
+	//}
+	//msg.Requeue(time.Second * 2)
+	//return errors.New("random err")
+	//}
+	////msg.Finish()
+	//return nil
+	//}))
 
 	// 3. 通过http请求来发现nsqd生产者和配置topic
 	if err := consumer.ConnectToNSQD(IPStrConsumer); err != nil {
@@ -65,5 +89,5 @@ func doConsumerTask() {
 
 }
 func main() {
-	doConsumerTask()
+	doConsumerTask(deal)
 }
