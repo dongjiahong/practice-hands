@@ -1,0 +1,39 @@
+2021-05-14 11:39:18|启动 main
+2021-05-14 11:39:18|启动 restartWeb
+2021-05-14 11:39:18|watch.conf 读取失败 error:  open watch.conf: no such file or directory
+2021-05-14 11:39:18|启动watch
+2021-05-14 11:39:18|no such file or directory
+2021-05-14 11:43:27|启动 main
+2021-05-14 11:43:27|启动watch
+2021-05-14 11:43:27|启动 restartWeb
+2021-05-14 11:43:27|conf 解析失败 invalid character '"' after object key:value pair
+2021-05-14 11:49:21|启动 main
+2021-05-14 11:49:21|启动 restartWeb
+2021-05-14 11:49:21|启动watch
+2021-05-14 11:52:46|server err: accept tcp [::]:1122: use of closed network connection
+2021-05-14 11:52:46|Server on 1122 stopped
+2021-05-14 11:52:47|启动 main
+2021-05-14 11:52:47|启动watch
+2021-05-14 11:52:47|启动 restartWeb
+2021-05-14 11:52:59|监听到事件event:  "watch.conf": RENAME 2021-05-14 11:52:59.6213144 +0800 CST m=+12.001776601
+2021-05-14 11:52:59|监听到事件event:  "watch.conf": CHMOD 2021-05-14 11:52:59.6215913 +0800 CST m=+12.002053401
+2021-05-14 11:52:59|监听到事件event:  "watch.conf": REMOVE 2021-05-14 11:52:59.6218561 +0800 CST m=+12.002318301
+2021-05-14 11:54:56|server err: accept tcp [::]:1122: use of closed network connection
+2021-05-14 11:54:56|Server on 1122 stopped
+2021-05-14 11:54:57|启动 main
+2021-05-14 11:54:57|启动watch
+2021-05-14 11:54:57|启动 restartWeb
+2021-05-14 11:55:04|监听到事件event:  "watch.conf": RENAME 2021-05-14 11:55:04.3839184 +0800 CST m=+6.730947501
+2021-05-14 11:55:04|监听到事件event:  "watch.conf": CHMOD 2021-05-14 11:55:04.3843086 +0800 CST m=+6.731337601
+2021-05-14 11:55:04|收到通知和准备 restartWeb
+2021-05-14 11:55:07|当前进程pid:  14528
+2021-05-14 11:55:07|chmod 777 
+2021-05-14 11:55:07|kill -1 14528
+2021-05-14 11:55:07|更新完成 14528 
+2021-05-14 11:55:07|收到通知和准备 restartWeb
+2021-05-14 11:55:07|监听到事件event:  "watch.conf": REMOVE 2021-05-14 11:55:07.4414497 +0800 CST m=+9.788478701
+2021-05-14 11:55:07|启动 main
+2021-05-14 11:55:07|启动watch
+2021-05-14 11:55:07|启动 restartWeb
+2021-05-14 11:55:07|server err: accept tcp [::]:1122: use of closed network connection
+2021-05-14 11:55:07|Server on 1122 stopped
