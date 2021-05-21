@@ -39,6 +39,12 @@ func main() {
 	go watch()
 	go restartWeb()
 	go web()
+	go func() {
+		for i := 0; i < 50; i++ {
+			simpleLog("======> echo ------>> ", i, " ver: ", curVer)
+			time.Sleep(time.Second * 1)
+		}
+	}()
 	wait.Wait()
 }
 
@@ -99,6 +105,7 @@ func restartWeb() {
 
 			simpleLog("kill -1", curPid)
 			exec.Command("kill", "-1", curPid).Run()
+			simpleLog("新进程pid：", syscall.Getpid())
 
 			simpleLog("更新完成", curPid, binName)
 		}
