@@ -1,0 +1,38 @@
+syntax = "v1"
+
+info(
+	title: "短域名"
+	desc: "短域名服务"
+	author: "董家宏"
+	email: "dongjiahong@hotmail.com"
+)
+
+type (
+	shortenReq {
+		Url string `from:"url"`
+	}
+	shortenResp {
+		Shorten string `json:"shorten"`
+	}
+)
+
+type (
+	expandReq {
+		Shorten string `from:"shorten"`
+	}
+	expandResp {
+		Url string `json:"url"`
+	}
+)
+
+service shorturl-api { // service这一行定义了service的名字 shorturl-api
+	@server( // 部分用来定义server端用到的属性
+		handler: ShortenHandler // handler 定义了服务端handler名字
+	)
+	get /shorten(shortenReq) returns(shortenResp) // 定义了get方法的路由、请求、返回参数等
+	
+	@server(
+		handler: ExpandHandler
+	)
+	get /expand(expandReq) returns(expandResp)
+}
