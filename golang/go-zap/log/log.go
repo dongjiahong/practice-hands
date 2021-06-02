@@ -25,8 +25,8 @@ func init() {
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // 按级别显示不同颜色，不需要的话用zapcore.CapitalLevelEncoder
 		EncodeTime:     zapcore.ISO8601TimeEncoder,       // 指定时间格式
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,   // 一般zapcore.SecondsDurationEncoder, 执行消耗的时间转化为浮点型的秒
+		EncodeCaller:   zapcore.ShortCallerEncoder,       // 一般zapcore.ShortCallerEncoder,以包/文件：行号 格式化调用堆栈
 	}
 	//encoderConfig := zap.NewProductionEncoderConfig()
 	//encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder        // 指定时间格式
