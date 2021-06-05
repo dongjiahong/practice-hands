@@ -35,10 +35,16 @@ set statusline=[%F]%y%r%m%*%=[Line:%l/%L,Column:%c][%p%%]
 ""Vim:
 ""cd phanviet/colors
 ""mv monokai_pro.vim ~/.vim/colors
-set t_Co=256
-colorscheme molokai
+" ==========>  molokai <========
+"set t_Co=256
+"colorscheme molokai
 let g:rehash256 = 1 
-let g:molokai_originl = 1	"1浅色，0深色 
+"let g:molokai_originl = 1	"1浅色，0深色 
+" ==========> monokai_pro <=======
+set termguicolors
+"colorscheme chito
+"colorscheme miramare
+colorscheme monokai_pro
 " 打开时光标在上次的位置
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm'\"")|else|exe "norm $"|endif|endif 
 
@@ -54,7 +60,6 @@ call plug#begin('~/.vim/plugged')
 Plug 'scrooloose/nerdtree'
 " molokai colors
 Plug 'tomasr/molokai'
-Plug 'J4CKR3D/Hypsteria'
 Plug 'Jimeno0/vim-chito'
 Plug 'phanviet/vim-monokai-pro'
 Plug 'franbach/miramare'
@@ -67,6 +72,7 @@ Plug 'preservim/tagbar'
 Plug 'scrooloose/nerdcommenter'
 " coc
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" rust
 " luochen1990/rainbow 彩虹括号
 Plug 'luochen1990/rainbow'
 " toml
@@ -83,12 +89,21 @@ let mapleader=","
 " ,cs 以性感方式注释
 " ,cu 取消注释
 
+"------>>> coc <<<---------
+" 设置悬浮文档
+nnoremap <silent> <leader>h :call CocActionAsync('doHover')<CR>
+" 批量重命名
+nmap <leader>r <Plug>(coc-rename)
+" 重构：把光标下的变量/trait/类型所有相关的代码提取出来，在左窗口统一修改
+nmap <leader>rf <Plug>(coc-refactor)
+nmap <leader>cr <Plug>(coc-references)
+
 "------->>>rainbow 彩虹括号<<<-----
 let g:rainbow_active = 1
 
 " ---------> vim-go <-------------
-"let g:go_fmt_autosave=0
-"let g:go_fmt_command="gofmt"
+let g:go_fmt_autosave=0
+let g:go_fmt_command="gofmt"
 let g:go_imports_autosave=0 " 保存时不自动导入包--太慢了
 "let g:go_template_autocreate = 0 " 新文件不自动填充
 let g:go_highlight_types = 1
@@ -104,11 +119,12 @@ let g:go_code_completion_enabled = 0
 let g:go_diagnostics_enabled = 0
 let g:go_metalinter_enabled = []
 "Find all references of a given type/function in the codebase with ,+cr:
-nmap <leader>cr <Plug>(coc-references)
+"autocmd BufEnter *.go nmap <leader>cr <Plug>(coc-references)
 "Not many options here, but there’s renaming the symbol your cursor is on with ,+r:
-nmap <leader>r <Plug>(coc-rename)
+"autocmd BufEnter *.go nmap <leader>r <Plug>(coc-rename)
 " 不让coc-go提示
 "autocmd FileType go let b:coc_suggest_disable = 1
+"autocmd VimEnter *.go NERDTreeToggle
 
 " -------------> gotags <------------
 map <F8> :Tagbar<CR>

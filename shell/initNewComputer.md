@@ -34,7 +34,7 @@ nvim -c 'GoInstallBinaries|q'
 ```
 # 安装各种所需的coc组件
 ```sh
-nvim -c 'CocInstall -sync coc-go coc-rls coc-html coc-css coc-json|q'
+nvim -c 'CocInstall -sync coc-go coc-rls coc-html coc-css coc-json coc-rust-analyzer|q'
 ```
 
 # rust安装组件
