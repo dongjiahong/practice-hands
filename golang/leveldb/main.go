@@ -6,9 +6,11 @@ import (
 
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/util"
+
+	"level/ldb"
 )
 
-func main() {
+func Raw() {
 	// 创建并打开数据库
 	db, err := leveldb.OpenFile("./db", nil)
 	if err != nil {
@@ -58,9 +60,14 @@ func main() {
 
 	// 查找数据
 	/* -- 结果 --
+	查找数据: key1, value: value1
+	查找数据: key2, value: value2
+	查找数据: key3, value: value3
+	查找数据: key5, value: value5
+	查找数据: key6, value: 10000
 	查找数据: key7, value: 20000
 	*/
-	key := "key7"
+	key := "key"
 	iter = db.NewIterator(nil, nil)
 	for ok := iter.Seek([]byte(key)); ok; ok = iter.Next() {
 		fmt.Printf("查找数据: %s, value: %s\n", iter.Key(), iter.Value())
@@ -98,14 +105,23 @@ func main() {
 	}
 	iter.Release()
 
-	// 修改key7的值
-	/*
-		key: key7, value: 8888
-	*/
-	db.Put([]byte(key), []byte("8888"), nil)
-	iter = db.NewIterator(nil, nil)
-	for ok := iter.Seek([]byte(key)); ok; ok = iter.Next() {
-		fmt.Printf("key: %s,修改后的值： value: %s\n", iter.Key(), iter.Value())
+}
+
+func main() {
+	// Raw()
+	var conf = ldb.Config{DBPath: "./db"}
+	db, err := ldb.NewDB(&conf)
+	if err != nil {
+		panic(err)
 	}
-	iter.Release()
+	defer db.DB.Close()
+
+	db.Put("k1", "v1")
+	db.Put("k2", "v3")
+	if data, err := db.Get("k1"); err != nil {
+		panic(err)
+	} else {
+		fmt.Printf("%s\n", data)
+	}
+
 }
