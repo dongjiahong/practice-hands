@@ -47,6 +47,10 @@ func (d *LDB) Get(key string) (string, error) {
 	return string(res), nil
 }
 
+func (d *LDB) Delete(key string) error {
+	return d.DB.Delete([]byte(key), nil)
+}
+
 // Search 搜索key
 func (d *LDB) Search(key string) []string {
 	iter := d.DB.NewIterator(nil, nil)
