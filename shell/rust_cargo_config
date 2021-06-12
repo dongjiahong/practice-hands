@@ -1,3 +1,4 @@
+# 放在目录～/.cargo/config
 [source.crates-io]
 registry = "https://github.com/rust-lang/crates.io-index"
 replace-with = 'ustc'

@@ -97,7 +97,9 @@ nmap <leader>r <Plug>(coc-rename)
 " 重构：把光标下的变量/trait/类型所有相关的代码提取出来，在左窗口统一修改
 nmap <leader>rf <Plug>(coc-refactor)
 nmap <leader>cr <Plug>(coc-references)
-nmap <silent> gd :call CocAction('jumpDefinition', 'split')<CR>
+nmap <silent> gd :call CocAction('jumpDefinition', 'tab')<CR>
+"nmap <silent> gd :call CocAction('jumpDefinition', 'vsplit')<CR>
+"nmap <silent> gd :call CocAction('jumpDefinition', 'split')<CR>
 
 "------->>>rainbow 彩虹括号<<<-----
 let g:rainbow_active = 1
