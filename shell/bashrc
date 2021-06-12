@@ -40,5 +40,7 @@ export GOPROXY="https://goproxy.io,direct"
 #  export https_proxy="socks5://vpn2ha:vpn_ha666@47.243.22.227:60338"
 
 # rust
+export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
+export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
 source "$HOME/.cargo/env"
 export PATH="$PATH:$HOME/.cargo/bin"
