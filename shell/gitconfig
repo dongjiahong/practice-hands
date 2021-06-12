@@ -11,7 +11,5 @@
     editor = vim
 [http]
         proxyAuthMethod = basic
-        proxy = http://hyys:hyyspass@117.160.204.14:10009
-[https]
-        proxy = http://hyys:hyyspass@117.160.204.14:10009
+        proxy = "socks5://vpn2ha:vpn_ha666@47.243.22.227:60338"
 
