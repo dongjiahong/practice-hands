@@ -28,23 +28,6 @@ set nobackup		"不允许自动备份
 
 set laststatus=2	"显示状态栏
 set statusline=[%F]%y%r%m%*%=[Line:%l/%L,Column:%c][%p%%]
-"XXX 对于主题
-""Neovim:
-""cd phanviet/colors
-""mv monokai_pro.vim ~/.config/nvim/colors
-""Vim:
-""cd phanviet/colors
-""mv monokai_pro.vim ~/.vim/colors
-" ==========>  molokai <========
-"set t_Co=256
-"colorscheme molokai
-let g:rehash256 = 1 
-"let g:molokai_originl = 1	"1浅色，0深色 
-" ==========> monokai_pro <=======
-set termguicolors
-"colorscheme chito
-"colorscheme miramare
-"colorscheme monokai_pro
 " 打开时光标在上次的位置
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm'\"")|else|exe "norm $"|endif|endif 
 
@@ -61,9 +44,9 @@ Plug 'scrooloose/nerdtree'
 " molokai colors
 "Plug 'tomasr/molokai'
 "Plug 'Jimeno0/vim-chito'
-Plug 'phanviet/vim-monokai-pro'
+"Plug 'phanviet/vim-monokai-pro'
 "Plug 'franbach/miramare'
-Plug 'dracula/vim', {'as':'dracula'}
+"Plug 'dracula/vim', {'as':'dracula'}
 " golang
 Plug 'fatih/vim-go'
 " gotags
@@ -81,7 +64,24 @@ Plug 'cespare/vim-toml'
 
 call plug#end()
 
-colorscheme dracula
+"XXX 对于主题
+""Neovim:
+""cd phanviet/colors
+""mv monokai_pro.vim ~/.config/nvim/colors
+""Vim:
+""cd phanviet/colors
+""mv monokai_pro.vim ~/.vim/colors
+" ==========>  molokai <========
+"set t_Co=256
+"colorscheme molokai
+"let g:rehash256 = 1 
+"let g:molokai_originl = 1	"1浅色，0深色 
+" ==========> monokai_pro <=======
+"set termguicolors
+"colorscheme chito
+"colorscheme miramare
+colorscheme monokai_pro " 自己修改锅的monokai_pro在colors中
+"colorscheme dracula
 
 "-------->>NERD Tree<<-------
 "宏F2打开目录树
