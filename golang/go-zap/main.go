@@ -20,6 +20,8 @@ func (t TestContextLog) Test(ctx *gin.Context) {
 	name := ctx.Query("name")
 
 	zlog.WithContext(ctx).Debug("测试日志", zap.String("name", name))
+	zlog.WithContext(ctx).Debug("测试日志", zap.String("name", name))
+	zlog.WithContext(ctx).Debug("测试日志", zap.String("name", name))
 }
 
 func main() {

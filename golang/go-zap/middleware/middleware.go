@@ -17,7 +17,7 @@ import (
 func traceLoggerMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 每个请求生成的请求traceId具有全局唯一性
-		u1, _ := uuid.NewV4()
+		u1 := uuid.NewV4()
 		traceId := u1.String()
 		zlog.NewContext(ctx, zap.String("traceId", traceId))
 
