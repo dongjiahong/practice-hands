@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
+	"searcheth/bzz"
 	token "searcheth/erc"
 )
 
@@ -132,7 +133,7 @@ func getTransferEvent(tokenAddr string) {
 	}
 }
 
-func main() {
+func runGnt() {
 	// gnt token合约地址: 0xa74476443119A942dE498590Fe1f2454d7D4aC0d
 	// gnt 要查询的账户地址: 0x614055249E6B330F34E52de7415439E6919d3A46
 	tokenAddr := "0xa74476443119A942dE498590Fe1f2454d7D4aC0d"
@@ -144,4 +145,66 @@ func main() {
 	log.Printf("balance: %f\n", balance)
 
 	getTransferEvent(tokenAddr)
+}
+
+func runBzz() {
+	// gnt
+	//cgnt := bzz.Config{
+	//NodeApi:     "https://mainnet.infura.io/v3/3ebcec9d8c6142c9aaa2ba10eec55424",
+	//TokenAddr:   "0xa74476443119A942dE498590Fe1f2454d7D4aC0d",
+	//AccountAddr: "0x614055249E6B330F34E52de7415439E6919d3A46",
+	//}
+
+	//     bzz 在xDAI上的合约地址
+	//要查询的账户地址
+	//     xDAI 链的endpoint url
+	c := bzz.Config{
+		//NodeApi: "https://dai.poa.network",
+		NodeApi: "https://rpc.xdaichain.com/",
+		//NodeApi: "wss://xdai.poanetwork.dev/wss",
+		//NodeApi: "wss://rpc.xdaichain.com/wss",
+		TokenAddr:   "0xdBF3Ea6F5beE45c02255B2c26a16F300502F68da",
+		AccountAddr: "0x22e6a72312853eec610583c55f8d9977092dedd1",
+	}
+
+	// 1.连接客户端
+	//cli, err := bzz.NewClient(&cgnt)
+	cli, err := bzz.NewClient(&c)
+	if err != nil {
+		log.Println("get bzz client err: ", err)
+		return
+	}
+	log.Println("symbol: ", cli.Symbol)
+	// 2. 获取最近的高度
+	bNum, err := cli.GetRecentBlockNum()
+	if err != nil {
+		panic(err)
+	}
+	log.Println("xdai block num is: ", bNum)
+
+	// 3. 获取账户余额
+	fBanlance, err := cli.GetTokenBalance()
+	if err != nil {
+		panic(err)
+	}
+	fb, _ := fBanlance.Float64()
+	log.Printf("bzz in xdai balance: %f\n", fb)
+
+	// 4. 获取交易记录 20h17280个块, 1h720个块
+	events, err := cli.GetTransferEvent(16701040, 16718320) // 24h 17280 block
+	//events, err := cli.GetTransferEvent(16717700, 16718320) // 1h 720 block
+	//events, err := cli.GetTransferEvent(1671800, bNum)
+
+	if err != nil {
+		panic(err)
+	}
+	log.Println("envent size: ", len(events))
+	//for _, event := range events {
+	//log.Printf("bzz in xdai envent: %+v\n", event)
+	//}
+}
+
+func main() {
+	// runGnt()
+	runBzz()
 }
