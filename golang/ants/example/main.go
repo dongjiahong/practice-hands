@@ -41,9 +41,7 @@ func main() {
 	nums := make([]int, DataSize)
 	rand.Seed(time.Now().Unix())
 	for i := range nums {
-		x := rand.Intn(1000)
-		nums[i] = x
-		fmt.Println("-------> ", x, " ------> ", nums[i])
+		nums[i] = rand.Intn(1000)
 	}
 
 	var wg sync.WaitGroup
