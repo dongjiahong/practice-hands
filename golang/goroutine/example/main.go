@@ -28,14 +28,16 @@ func run() {
 
 func main() {
 	run()
-	select {
-	case <-done:
-		if rand.Intn(4) == 2 {
-			over <- true
+	for {
+		select {
+		case <-done:
+			if rand.Intn(4) == 2 {
+				over <- true
+			}
+			run()
+		case <-over:
+			fmt.Println("over")
+			return
 		}
-		run()
-	case <-over:
-		return
 	}
-	fmt.Println("over")
 }

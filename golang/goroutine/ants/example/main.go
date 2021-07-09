@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 	"sync"
 	"time"
 
@@ -26,7 +27,7 @@ func (t *Task) Do() {
 func taskFunc(data interface{}) {
 	task := data.(*Task)
 	task.Do()
-	fmt.Printf("task: %d sum:%d\n", task.index, task.sum)
+	fmt.Printf("task: %d sum:%d\t goroutines num: %d\n", task.index, task.sum, runtime.NumGoroutine())
 }
 
 func main() {
