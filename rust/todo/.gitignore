@@ -1,6 +1,0 @@
-target
-*.log
-*.swp
-dist
-go.sum
-migrations
