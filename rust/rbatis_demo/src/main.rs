@@ -1,6 +1,9 @@
-
 #[macro_use]
 extern crate lazy_static;
+
+use std::io::Error;
+use std::path::Path;
+use std::result::Result;
 
 use fast_log::init_log;
 use log::info;
@@ -8,12 +11,14 @@ use rbatis::crud::CRUD;
 use rbatis::crud_table;
 use rbatis::rbatis::Rbatis;
 
+use serde::{Deserialize, Serialize};
+
 lazy_static! {
     static ref RB: Rbatis = Rbatis::new();
 }
 
 #[crud_table]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TSetting {
     pub id: Option<i32>,
     pub s_key: Option<String>,
@@ -37,6 +42,12 @@ pub struct TNotice {
     pub deleted: Option<i32>,
 }
 
+fn get_size(path: &str) -> Result<u64, Error> {
+    let fs = Path::new(path);
+    let metadata = fs.metadata()?;
+    Ok(metadata.len())
+}
+
 #[tokio::main]
 async fn main() {
     init_log("requests.log", 1000, log::Level::Info, None, true).unwrap();
@@ -54,6 +65,19 @@ async fn main() {
     // 查所有
     let r: Vec<TSetting> = RB.fetch_list().await.unwrap();
     println!("{:?}", r);
+    println!("====================================");
+
+    let size = get_size("Cargo.toml.x").unwrap();
+    println!("{}", size);
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_size() {
+        let size = get_size("Cargo.toml").unwrap();
+        assert_eq!(size, 489);
+    }
+}
 
