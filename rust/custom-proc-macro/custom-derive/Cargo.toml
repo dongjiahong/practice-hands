@@ -1,0 +1,13 @@
+[package]
+name = "custom-derive"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true # 使用过程宏
+
+[dependencies]
+syn = "1.0"
+quote = "1.0"
